@@ -1,21 +1,10 @@
 # crew-acoustik.github.io
 Acoustik Crew
 
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Acoustik Crew Planner</title>
-<meta name="theme-color" content="#d4500a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Crew Planner">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Acoustik Crew Planner (Copy)</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-</head><body>
 
 <style>
   :root {
@@ -211,7 +200,6 @@ Acoustik Crew
   .edit-row { background:var(--bg2); border:1px solid var(--border); border-left:4px solid var(--border); border-radius:var(--radius); padding:10px 12px; margin-bottom:6px; box-shadow:var(--shadow); }
   .edit-row.has-gap { border-left-color:var(--gap); }
   .edit-row.has-conflict { border-left-color:var(--warn); }
-  .edit-row.edited { background:var(--accent-bg); }
   .edit-row.flash { outline:2px solid var(--accent); }
   .edit-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
   .edit-date { font-family:'DM Mono',monospace; font-size:11px; color:var(--fg2); min-width:62px; }
@@ -221,6 +209,31 @@ Acoustik Crew
   .edit-field { display:flex; flex-direction:column; gap:2px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--fg3); }
   .edit-field select { font:inherit; font-size:13px; font-weight:500; text-transform:none; letter-spacing:0; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); }
   .edit-extra { font-size:11px; color:var(--fg2); margin-top:6px; }
+  .edit-input { font:inherit; font-size:13px; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); }
+  .edit-title-input { flex:1; min-width:140px; font-weight:600; }
+  .btn-primary { background:var(--accent)!important; border-color:var(--accent)!important; color:#fff!important; }
+  .btn-danger { color:var(--gap)!important; border-color:var(--gap)!important; }
+  .modal-back { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:300; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal { background:var(--bg2); color:var(--fg); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 8px 32px rgba(0,0,0,0.28); width:100%; max-width:460px; max-height:90vh; overflow:auto; padding:16px; }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .modal-title { font-weight:700; font-size:15px; }
+  .modal-x { cursor:pointer; color:var(--fg3); font-size:20px; line-height:1; background:none; border:none; font-family:inherit; }
+  .modal-x:hover { color:var(--fg); }
+  .modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .modal-grid .full { grid-column:1/-1; }
+  .modal .edit-field .edit-input, .modal .edit-field select { width:100%; font-size:13px; }
+  .xwrap { position:relative; display:block; }
+  .xwrap .edit-input { width:100%; padding-right:24px; }
+  .xbtn { position:absolute; top:50%; right:4px; transform:translateY(-50%); width:18px; height:18px; line-height:16px; padding:0; border:none; border-radius:50%; background:transparent; color:var(--fg3); font-size:15px; cursor:pointer; font-family:inherit; text-transform:none; letter-spacing:0; }
+  .xbtn:hover { background:var(--gap-bg); color:var(--gap); }
+  .xwrap input:placeholder-shown + .xbtn { display:none; }
+  .slot-plus button { align-self:flex-start; min-width:38px; font-size:15px; padding:4px 10px; }
+  .modal-sub { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--fg3); margin:14px 0 6px; }
+  .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; align-items:center; }
+  .modal-err { color:var(--gap); font-size:11px; margin-right:auto; }
+  @media (max-width:700px) { .modal .edit-field .edit-input, .modal .edit-field select { font-size:16px; } .modal-grid { grid-template-columns:1fr; } }
+  .edit-venue-input { flex:1; min-width:120px; max-width:220px; font-size:12px; color:var(--fg2); }
+  @media (max-width:700px) { .edit-input { font-size:16px; } }
 
   /* Warehouse duty entries */
   .warehouse-card {
@@ -325,6 +338,21 @@ Acoustik Crew
   :root[data-theme="dark"] .cal-event.ev-warehouse { background:#1a3a42; color:#7ec8d8; }
   @media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) .cal-event.ev-warehouse { background:#1a3a42; color:#7ec8d8; } }
 
+  /* Week view */
+  .cal-grid.wk .cal-cell { min-height:260px; padding:6px 5px; }
+  .cal-grid.wk .cal-day-num { font-size:12px; margin-bottom:6px; }
+  .cal-grid.wk .cal-event { white-space:normal; overflow:visible; text-overflow:clip; font-size:11px; padding:4px 6px; margin-bottom:4px; line-height:1.3; }
+  .cal-grid.wk .wk-title { font-weight:600; overflow-wrap:anywhere; }
+  .cal-grid.wk .wk-venue { font-size:9px; font-weight:400; opacity:0.8; overflow-wrap:anywhere; }
+  .wk-dow { display:none; }
+  @media (max-width:700px) {
+    .cal-grid.wk { grid-template-columns:1fr; }
+    .cal-grid.wk .cal-dow { display:none; }
+    .cal-grid.wk .cal-cell { min-height:56px; }
+    .cal-grid.wk .cal-event { font-size:12px; }
+    .wk-dow { display:inline; text-transform:uppercase; letter-spacing:0.06em; font-size:10px; }
+  }
+
   /* Tooltip / popup */
   .cal-popup {
     position:fixed; z-index:200;
@@ -352,26 +380,196 @@ Acoustik Crew
     .cal-event { font-size:9px; padding:1px 3px; }
     .cal-day-num { font-size:10px; }
   }
+
+  /* ═══════════ APP THEME — mobile-first ═══════════ */
+  :root { --r:18px; --bar-h:58px; --tab-h:66px; --stripe:transparent;
+          --sh2:0 1px 2px rgba(30,24,10,.05), 0 6px 20px rgba(30,24,10,.06); }
+  html { -webkit-tap-highlight-color:transparent; }
+  body { font-size:15px; -webkit-font-smoothing:antialiased;
+         padding-top:0; padding-bottom:calc(var(--tab-h) + 30px + env(safe-area-inset-bottom,0px));
+         padding-left:max(14px,env(safe-area-inset-left,0px)); padding-right:max(14px,env(safe-area-inset-right,0px)); }
+  button, select, input { touch-action:manipulation; }
+  .app-main { max-width:640px; margin:0 auto; }
+
+  /* top bar */
+  .app-bar { position:sticky; top:env(safe-area-inset-top,0px); z-index:100; height:var(--bar-h);
+    margin:0 -14px 4px; padding:0 14px; display:flex; align-items:center; justify-content:space-between;
+    background:color-mix(in srgb,var(--bg) 84%,transparent); -webkit-backdrop-filter:saturate(1.4) blur(14px); backdrop-filter:saturate(1.4) blur(14px); }
+  .app-title { display:flex; flex-direction:column; line-height:1.05; }
+  .app-title b { font-size:22px; font-weight:700; letter-spacing:-.03em; color:var(--accent); }
+  .app-title small { font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--fg3); margin-top:2px; }
+  .app-actions { display:flex; align-items:center; gap:8px; }
+  .icon-btn { width:40px; height:40px; padding:0; border-radius:50%; background:var(--bg2); border:1px solid var(--border); font-size:17px; display:grid; place-items:center; box-shadow:var(--sh2); color:var(--fg2); cursor:pointer; }
+  .pill-btn { height:40px; padding:0 14px; border-radius:999px; border:1px solid var(--border); background:var(--bg2); color:var(--kd); font:600 13px 'Inter',system-ui,sans-serif; cursor:pointer; box-shadow:var(--sh2); }
+
+  /* bottom tab bar */
+  .tabbar { position:fixed; left:0; right:0; bottom:0; z-index:150; display:flex; justify-content:center;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));
+    background:color-mix(in srgb,var(--bg2) 90%,transparent); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border-top:1px solid var(--border); }
+  .tabbar-inner { display:flex; gap:6px; width:100%; max-width:520px; }
+  .tabbar .view-tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px 6px; border-radius:16px;
+    background:transparent; box-shadow:none; color:var(--fg3); font-size:11px; font-weight:600; border:0; cursor:pointer; transition:background .15s,color .15s; }
+  .tabbar .view-tab svg { width:23px; height:23px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .tabbar .view-tab.active { background:var(--accent-bg); color:var(--accent); box-shadow:none; }
+
+  /* stats + legend + filters scroll rows */
+  .summary-row { display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x proximity; margin:6px -14px 12px; padding:2px 14px 8px; scrollbar-width:none; }
+  .summary-row::-webkit-scrollbar, .filters::-webkit-scrollbar, .legend::-webkit-scrollbar { display:none; }
+  .stat-card { flex:0 0 138px; scroll-snap-align:start; border-radius:var(--r); box-shadow:var(--sh2); padding:14px 16px; }
+  .stat-card .label { font-size:10px; }
+  .stat-card .val { font-size:28px; letter-spacing:-.02em; margin-top:4px; }
+  .stat-card .sub { font-size:11px; margin-top:4px; }
+  .legend { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; border:0; background:transparent; padding:0 0 2px; margin:0 -14px 10px; padding-left:14px; padding-right:14px; gap:14px; }
+  .legend-item { white-space:nowrap; font-size:12px; color:var(--fg2); }
+  .filters { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -14px 12px; padding:2px 14px 4px; gap:8px; }
+  #period-bar { flex-wrap:wrap; overflow:visible; margin:0 0 12px; padding:0; }
+  .filter-label { white-space:nowrap; font-size:12px; }
+  .chip { flex:0 0 auto; white-space:nowrap; padding:8px 15px; font-size:13px; border-radius:999px; }
+  .nav-btn { min-height:38px; padding:0 15px; border-radius:999px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+  .nav-btn.btn-primary { box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 35%,transparent); }
+
+  /* show cards */
+  .month-header { font-size:12px; letter-spacing:.08em; color:var(--fg2); padding:16px 2px 9px; }
+  .show-list { gap:10px; }
+  .show-card { border:1px solid var(--border); border-left:1px solid var(--border)!important; border-radius:var(--r); padding:13px 14px 13px 18px;
+    box-shadow:inset 4px 0 0 var(--stripe), var(--sh2); grid-template-columns:58px 1fr auto; gap:8px 12px; align-items:center; overflow:hidden; }
+  .show-card:hover { box-shadow:inset 4px 0 0 var(--stripe), var(--sh2); }
+  .show-card:active { transform:scale(.992); }
+  .show-card.client-gsh { --stripe:var(--gsh-mid); } .show-card.client-kd { --stripe:var(--kd-mid); } .show-card.client-other { --stripe:var(--accent); }
+  .show-card.has-gap { --stripe:var(--gap); } .show-card.has-conflict { --stripe:var(--warn); }
+  .show-date { align-items:center; text-align:center; background:var(--bg3); border-radius:14px; padding:8px 2px; font-family:inherit; gap:1px; }
+  .show-date .dow { font-size:10px; font-weight:700; letter-spacing:.07em; }
+  .show-date > div:last-child { font-size:13px; font-weight:700; color:var(--fg); line-height:1.15; }
+  .show-name { font-size:16px; font-weight:650; letter-spacing:-.01em; }
+  .show-venue { font-size:13px; margin-top:2px; }
+  .client-badge { font-size:10px; padding:3px 8px; border-radius:999px; }
+  .crew-row { gap:6px; margin-top:8px; }
+  .crew-tag { font-size:12px; padding:4px 10px; border-radius:999px; }
+  .crew-role { font-size:9px; }
+  .status-pill { font-size:10px; padding:4px 10px; }
+  .note-line { font-size:12px; }
+  .show-detail { font-size:13px; }
+  .warehouse-card { border-radius:var(--r); border:1px dashed var(--border); border-left:1px dashed var(--border); padding:11px 14px 11px 18px; grid-template-columns:58px 1fr; gap:10px; opacity:.9;
+    box-shadow:inset 4px 0 0 #4a90a4; align-items:center; }
+  .warehouse-card .show-date { background:var(--bg3); }
+  .warehouse-label { font-size:12px; }
+  .empty { padding:56px 16px; }
+  @media (max-width:600px) { .show-card { grid-template-columns:58px 1fr; } .flags { grid-column:1/-1; flex-direction:row; align-items:center; gap:8px; } .dt-grid { grid-template-columns:1fr; } }
+
+  /* calendar: dots + tap a day */
+  .cal-nav { margin:4px 0 14px; }
+  .cal-month-label { font-size:21px; letter-spacing:-.02em; }
+  .cal-nav-btn { width:44px; height:44px; padding:0; border-radius:50%; font-size:24px; line-height:1; display:grid; place-items:center; box-shadow:var(--sh2); }
+  #period-nav .cal-nav-btn { width:auto; height:36px; padding:0 14px!important; font-size:15px!important; border-radius:999px; }
+  .cal-grid { background:transparent; border:0; gap:2px; border-radius:0; overflow:visible; }
+  .cal-dow { background:transparent; font-size:11px; padding:2px 0 4px; }
+  .cal-cell { border-radius:12px; min-height:90px; padding:5px 1px 5px; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; cursor:pointer; box-shadow:var(--sh2); border:1px solid var(--border); }
+  .cal-cell:active { transform:scale(.96); }
+  .cal-cell.weekend { background:color-mix(in srgb,var(--bg2) 93%,var(--accent) 7%); }
+  .cal-cell.other-month { background:transparent; box-shadow:none; border-color:transparent; opacity:.4; }
+  .cal-cell.today { background:var(--accent-bg); border-color:var(--accent); }
+  .cal-day-num { width:26px; height:26px; margin:0; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:600; color:var(--fg2); }
+  .cal-cell.today .cal-day-num { background:var(--accent); color:#fff; }
+  .cal-dots { display:flex; flex-direction:column; gap:2px; width:100%; min-width:0; }
+  .cal-dots .cal-event { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; line-clamp:4; overflow:hidden; white-space:normal; overflow-wrap:anywhere; hyphens:auto;
+    font-size:8.5px; font-weight:600; letter-spacing:-.015em; line-height:1.16; padding:2px 2px 0; border-bottom:2px solid transparent; margin:0; border-radius:5px; max-width:100%; cursor:pointer; }
+  .cal-dots .cal-event.ev-warehouse { font-weight:600; -webkit-line-clamp:1; line-clamp:1; white-space:nowrap; letter-spacing:-.02em; opacity:.9; }
+  .cal-more { font-size:9px; font-weight:600; color:var(--fg3); text-align:center; }
+  @media (min-width:520px) { .cal-dots .cal-event { font-size:11px; padding:3px 5px; } .cal-more { font-size:10px; } }
+
+  /* sheets (add event / day details) */
+  .modal-back { align-items:flex-end; padding:0; background:rgba(15,12,8,.5); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); animation:fadeIn .18s ease; }
+  .modal { max-width:600px; border:0; border-radius:26px 26px 0 0; padding:8px 18px calc(20px + env(safe-area-inset-bottom,0px)); max-height:90vh; box-shadow:0 -10px 40px rgba(0,0,0,.25); animation:slideUp .28s cubic-bezier(.2,.8,.2,1); }
+  .modal::before { content:''; display:block; width:42px; height:5px; border-radius:3px; background:var(--border); margin:6px auto 14px; }
+  .modal-title { font-size:18px; letter-spacing:-.01em; }
+  .modal-x { width:34px; height:34px; border-radius:50%; background:var(--bg3); font-size:20px; display:grid; place-items:center; }
+  .modal-actions .nav-btn { min-width:90px; min-height:44px; }
+  .day-item { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:13px 14px 13px 18px; margin-bottom:10px; box-shadow:inset 4px 0 0 var(--stripe); }
+  .day-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+  @keyframes slideUp { from { transform:translateY(40px); opacity:.4 } to { transform:none; opacity:1 } }
+
+  /* edit tab */
+  .edit-bar { border:0; border-radius:var(--r); box-shadow:var(--sh2); padding:12px 14px; font-size:13px; }
+  .edit-row { border:1px solid var(--border); border-left:1px solid var(--border); border-radius:var(--r); padding:13px 14px 13px 18px; margin-bottom:10px; box-shadow:inset 4px 0 0 var(--stripe-e,transparent), var(--sh2); }
+  .edit-row.has-gap { --stripe-e:var(--gap); border-left-color:var(--border); } .edit-row.has-conflict { --stripe-e:var(--warn); border-left-color:var(--border); }
+  .edit-row.wh-row { --stripe-e:#4a90a4; }
+  .edit-row.flash { outline:2px solid var(--accent); }
+  .edit-input, .edit-field select { min-height:42px; border-radius:12px; font-size:16px; }
+  .edit-field { font-size:10px; }
+  .edit-fields { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+  .edit-title-input { min-width:160px; }
+  .edit-venue-input { max-width:none; flex:1 1 100%; }
+
+  /* crew tab */
+  .crew-grid { grid-template-columns:1fr!important; gap:14px; }
+  .crew-panel { border-radius:var(--r); border:1px solid var(--border); box-shadow:var(--sh2); }
+  .crew-panel-header { padding:13px 16px; font-size:15px; }
+  .crew-day { padding:7px 16px; font-size:13px; }
+  .crew-day-pill { font-size:11px; }
+  .crew-day-detail { font-size:12px; }
+  select.edit-input { appearance:auto; }
+
+  /* compact stats, hide chrome that doesn't help on a tab */
+  .summary-row { margin-bottom:8px; padding-bottom:6px; }
+  .stat-card { flex:0 0 auto; min-width:118px; padding:10px 14px; }
+  .stat-card .val { font-size:24px; margin-top:2px; }
+  .stat-card .sub { font-size:11px; margin-top:2px; white-space:nowrap; }
+  body[data-view="edit"] #stats, body[data-view="edit"] .legend,
+  body[data-view="crew"] #stats, body[data-view="crew"] .legend { display:none; }
+
+  /* add-event sheet: two columns, sticky Save/Cancel */
+  @media (max-width:700px) { .modal-grid { grid-template-columns:1fr 1fr; } }
+  .modal-grid .full { grid-column:1/-1; }
+  .modal-actions { position:sticky; bottom:calc(-20px - env(safe-area-inset-bottom,0px)); background:var(--bg2); padding:12px 0 calc(8px + env(safe-area-inset-bottom,0px)); margin-top:12px; border-top:1px solid var(--border); }
+
+  /* password gate */
+  #lock { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:24px;
+    background:radial-gradient(120% 80% at 50% 0%, var(--accent-bg), var(--bg) 60%); }
+  body.locked #lock { display:flex; }
+  body.locked .app-bar, body.locked .tabbar, body.locked .app-main { display:none !important; }
+  .lock-card { width:100%; max-width:340px; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; }
+  .lock-logo { display:flex; flex-direction:column; line-height:1.05; margin-bottom:6px; }
+  .lock-logo b { font-size:34px; font-weight:700; letter-spacing:-.03em; color:var(--accent); }
+  .lock-logo small { font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--fg3); margin-top:4px; }
+  .lock-ico { width:44px; height:44px; stroke:var(--fg3); fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  #lock-pw { width:100%; text-align:center; font-size:18px; min-height:50px; border-radius:14px; }
+  .lock-err { min-height:18px; font-size:13px; color:var(--gap); font-weight:600; }
+  .lock-remember { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--fg2); cursor:pointer; }
+  .lock-btn { width:100%; min-height:50px; font-size:16px; }
+  .lock-card.shake { animation:shake .35s; }
+  @keyframes shake { 20%,60% { transform:translateX(-8px) } 40%,80% { transform:translateX(8px) } }
 </style>
 
-<div class="header">
-  <div class="logo">Acoustik <span>Crew Planner</span></div>
-  <div class="header-nav">
-    <div class="view-tabs">
-      <button class="view-tab active" id="tab-list" onclick="switchView('list')">List</button>
-      <button class="view-tab" id="tab-month" onclick="switchView('month')">Month</button>
-      <button class="view-tab" id="tab-cal" onclick="switchView('cal')">Calendar</button>
-      <button class="view-tab" id="tab-crew" onclick="switchView('crew')">Crew</button>
-      <button class="view-tab" id="tab-edit" onclick="switchView('edit')">Edit</button>
-    </div>
-    <button class="nav-btn active" onclick="setScope('upcoming')" id="btn-upcoming">Upcoming</button>
-    <button class="nav-btn" onclick="setScope('all')" id="btn-all">All 2026–27</button>
-    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
-    <button class="nav-btn" onclick="exportRentman()" style="background:var(--kd-bg);color:var(--kd);border-color:var(--kd)" title="Export confirmed shows for Rentman import">⬇ Rentman CSV</button>
-  </div>
+<!-- Password gate -->
+<div id="lock" role="dialog" aria-label="Enter password">
+  <form class="lock-card" onsubmit="return tryUnlock(event)" autocomplete="off">
+    <div class="lock-logo"><b>Acoustik</b><small>Crew Planner</small></div>
+    <svg class="lock-ico" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></svg>
+    <input id="lock-pw" class="edit-input" type="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" spellcheck="false">
+    <div id="lock-err" class="lock-err"></div>
+    <label class="lock-remember"><input type="checkbox" id="lock-keep" checked> Keep me unlocked on this device</label>
+    <button class="nav-btn btn-primary lock-btn" type="submit">Unlock</button>
+  </form>
 </div>
+<script>document.body.classList.add('locked');</script>
 
-<div style="max-width:900px;margin:0 auto;">
+<header class="app-bar">
+  <div class="app-title"><b>Acoustik</b><small>Crew Planner</small></div>
+  <div class="app-actions">
+    <button class="pill-btn" onclick="exportRentman()" title="Export confirmed shows for Rentman import">⬇ CSV</button>
+    <button class="theme-btn icon-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+    <button class="icon-btn" onclick="lockApp()" title="Lock" aria-label="Lock"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></svg></button>
+  </div>
+</header>
+<nav class="tabbar" aria-label="Sections"><div class="tabbar-inner">
+  <button class="view-tab active" id="tab-list" onclick="switchView('list')"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>All</span></button>
+  <button class="view-tab" id="tab-cal" onclick="switchView('cal')"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Calendar</span></button>
+  <button class="view-tab" id="tab-crew" onclick="switchView('crew')"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><path d="M16 5.6a3 3 0 010 5.8M18 14.4c1.7.6 2.7 2.1 3 4.6"/></svg><span>Crew</span></button>
+  <button class="view-tab" id="tab-edit" onclick="switchView('edit')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17z"/><path d="M14.5 7.5l3 3"/></svg><span>Edit</span></button>
+</div></nav>
+
+<div class="app-main">
 
 <div class="summary-row" id="stats"></div>
 
@@ -398,25 +596,26 @@ Acoustik Crew
 
 <!-- List view -->
 <div id="list-view">
+  <div class="filters" id="period-bar">
+    <span class="filter-label">Period:</span>
+    <select class="edit-input" id="period-sel" onchange="setPeriod(this.value)" style="font-size:12px;padding:4px 8px">
+      <option value="all">Upcoming</option>
+      <option value="week">By week</option>
+      <option value="month">By month</option>
+    </select>
+    <span id="period-nav" style="display:none;align-items:center;gap:6px">
+      <button class="cal-nav-btn" style="padding:3px 10px;font-size:12px" onclick="periodStep(-1)" title="Previous">←</button>
+      <span id="period-label" style="font-size:12px;font-weight:600;min-width:150px;text-align:center"></span>
+      <button class="cal-nav-btn" style="padding:3px 10px;font-size:12px" onclick="periodStep(1)" title="Next">→</button>
+      <button class="nav-btn" onclick="periodToday()">Today</button>
+    </span>
+  </div>
   <div id="schedule"></div>
 </div>
 
 <!-- Crew view -->
 <div id="crew-view" style="display:none">
   <div id="crew-schedule"></div>
-</div>
-
-<!-- Month view -->
-<div id="month-view" style="display:none">
-  <div class="cal-nav">
-    <button class="cal-nav-btn" onclick="mPrev()">← Prev</button>
-    <div style="text-align:center">
-      <div class="cal-month-label" id="month-label"></div>
-      <button class="nav-btn" style="margin-top:4px" onclick="mToday()">Today</button>
-    </div>
-    <button class="cal-nav-btn" onclick="mNext()">Next →</button>
-  </div>
-  <div id="month-schedule"></div>
 </div>
 
 <!-- Edit view -->
@@ -427,9 +626,12 @@ Acoustik Crew
 <!-- Calendar view -->
 <div id="cal-view">
   <div class="cal-nav">
-    <button class="cal-nav-btn" onclick="calPrev()">← Prev</button>
-    <div class="cal-month-label" id="cal-label"></div>
-    <button class="cal-nav-btn" onclick="calNext()">Next →</button>
+    <button class="cal-nav-btn" onclick="calPrev()" aria-label="Previous month">‹</button>
+    <div style="text-align:center">
+      <div class="cal-month-label" id="cal-label"></div>
+      <button class="nav-btn" style="margin-top:4px" onclick="calToday()">This month</button>
+    </div>
+    <button class="cal-nav-btn" onclick="calNext()" aria-label="Next month">›</button>
   </div>
   <div class="cal-grid" id="cal-grid"></div>
 </div>
@@ -447,6 +649,49 @@ Acoustik Crew
 </div>
 
 <script>
+
+// ── Password gate ──
+// Note: this is a simple front-door check in the page itself, not strong security.
+const PW_HASH = '59d15ae4d5106193ea3b6818b02521689d096611b0b75ad9267885b73309a43b';
+const AUTH_KEY = 'acoustik-auth-v1';
+async function pwHash(str) {
+  const data = new TextEncoder().encode('acoustik-crew|'+str);
+  if (window.crypto && crypto.subtle) {
+    const b = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  return null;
+}
+function unlockApp() { document.body.classList.remove('locked'); try { render(); } catch(e) {} }
+function lockApp() {
+  try { localStorage.removeItem(AUTH_KEY); } catch(e) {}
+  const pw = document.getElementById('lock-pw'); if (pw) pw.value = '';
+  document.getElementById('lock-err').textContent = '';
+  document.body.classList.add('locked');
+  setTimeout(()=>pw && pw.focus(), 50);
+}
+async function tryUnlock(e) {
+  if (e) e.preventDefault();
+  const pw = document.getElementById('lock-pw');
+  const h = await pwHash(pw.value);
+  if (h === PW_HASH) {
+    if (document.getElementById('lock-keep').checked) { try { localStorage.setItem(AUTH_KEY, PW_HASH); } catch(e) {} }
+    pw.value = ''; document.getElementById('lock-err').textContent = '';
+    unlockApp();
+  } else {
+    document.getElementById('lock-err').textContent = h===null ? 'This browser cannot check passwords (needs a secure page).' : 'Wrong password — try again.';
+    const card = document.querySelector('.lock-card'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    pw.select();
+  }
+  return false;
+}
+(function() {
+  let ok = false;
+  try { ok = localStorage.getItem(AUTH_KEY) === PW_HASH; } catch(e) {}
+  if (ok) document.body.classList.remove('locked');
+  else setTimeout(()=>{ const pw = document.getElementById('lock-pw'); if (pw) pw.focus(); }, 100);
+})();
+
 const TODAY = (() => { const t = new Date(); t.setHours(0,0,0,0); return t; })();
 const DAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS= ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -649,9 +894,77 @@ let OVR = {};
 try { OVR = JSON.parse(localStorage.getItem('acoustik-crew-overrides-v1')||'{}') || {}; } catch(e) { OVR = {}; }
 function saveOVR() { try { localStorage.setItem('acoustik-crew-overrides-v1', JSON.stringify(OVR)); } catch(e) {} }
 
+// Shared store: every viewer's edits are saved to the artifact database and appear live for everyone
+let DB = null, canWrite = true, pendingRender = false;
+function encK(k) { return encodeURIComponent(k).replace(/'/g,'%27'); }
+// ── Warehouse day edits (shared with everyone): date -> {crew:[names]} replaces the automatic warehouse crew ──
+let WHOVR = {};
+try { WHOVR = JSON.parse(localStorage.getItem('acoustik-warehouse-v1')||'{}') || {}; } catch(e) { WHOVR = {}; }
+function saveWh() { try { localStorage.setItem('acoustik-warehouse-v1', JSON.stringify(WHOVR)); } catch(e) {} }
+function pushWh(ds) {
+  if (!DB) return;
+  const ref = DB.collection('warehouseEdits').doc(ds);
+  const p = WHOVR[ds] ? ref.set({date:ds, crew:WHOVR[ds].crew}) : ref.delete();
+  Promise.resolve(p).catch(()=>{});
+}
+// ── Added events (shared with everyone) ──
+let CUSTOM = [];
+try { CUSTOM = JSON.parse(localStorage.getItem('acoustik-crew-custom-v1')||'[]') || []; } catch(e) { CUSTOM = []; }
+function saveCustom() { try { localStorage.setItem('acoustik-crew-custom-v1', JSON.stringify(CUSTOM)); } catch(e) {} }
+function cleanTxt(v) { return String(v==null?'':v).replace(/[<>"]/g,'').trim().slice(0,120); }
+function refreshShared() {
+  allShows = buildShows();
+  const ae = document.activeElement;
+  if (ae && ae.closest && ae.closest('#edit-schedule')) pendingRender = true; else render();
+}
+document.addEventListener('focusout', () => { setTimeout(() => { const ae = document.activeElement; if (pendingRender && !(ae && ae.closest && ae.closest('#edit-schedule'))) { pendingRender = false; render(); } }, 150); });
+function docId(key) { return key.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,150); }
+function pushOvr(key) {
+  if (!DB) return;
+  const ref = DB.collection('crewEdits').doc(docId(key));
+  const p = OVR[key] ? ref.set({key, ov:OVR[key]}) : ref.delete();
+  Promise.resolve(p).catch(()=>{});
+}
+(async () => {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const u = await window.claude.use('user');
+    if (u && u.can && u.can('data.write') === false) canWrite = false;
+    DB = await window.claude.use('db');
+    if (!DB) return;
+    DB.collection('crewEdits').onSnapshot(snap => {
+      const o = {};
+      snap.docs.forEach(d => { const v = d.data(); if (v && v.key && v.ov) o[v.key] = v.ov; });
+      OVR = o; saveOVR(); refreshShared();
+    }, () => {});
+    DB.collection('warehouseEdits').onSnapshot(snap => {
+      const o = {};
+      snap.docs.forEach(x => { const v = x.data(); if (v && v.date && Array.isArray(v.crew)) o[v.date] = {crew:v.crew}; });
+      WHOVR = o; saveWh(); refreshShared();
+    }, () => {});
+    DB.collection('customEvents').onSnapshot(snap => {
+      const list = [];
+      snap.docs.forEach(d => { const v = d.data(); if (v && v.id && v.date && v.title) list.push(v); });
+      CUSTOM = list; saveCustom(); refreshShared();
+    }, () => {});
+  } catch(e) {}
+})();
+
+function tempNames(ov) {
+  return String((ov && ov.temp) || '').split(',').map(x=>cleanTxt(x)).filter(Boolean).slice(0,6);
+}
 function buildShows() {
   const shows = [];
-  for (const s of gshRaw) {
+  const customRows = CUSTOM.filter(x => x && x.id && /^\d{4}-\d{2}-\d{2}$/.test(x.date||'') && x.title);
+  const gshAll = gshRaw.concat(customRows.filter(x=>x.client!=='kd').map(x=>({
+    date:x.date, event:cleanTxt(x.title), venue:cleanTxt(x.venue)||(x.client==='gsh'?'Guinness Storehouse':'TBC'),
+    client:x.client==='other'?'other':'gsh', status:x.status||'Booked', crew:{...(x.crew||{})}, customId:x.id
+  })));
+  const kdAll = kdRaw.concat(customRows.filter(x=>x.client==='kd').map(x=>({
+    date:x.date, show:cleanTxt(x.title), venue:cleanTxt(x.venue)||'TBC',
+    status:x.status||'Booked', crew:{...(x.crew||{})}, customId:x.id
+  })));
+  for (const s of gshAll) {
     const c = {...s.crew};
     // Xmas/Christmas Activation on its own needs only ONE crew member; the rest go to warehouse
     let whNote = '';
@@ -666,46 +979,61 @@ function buildShows() {
     }
     // Manual edit wins over automatic rules
     const ov = OVR[s.date+'|'+s.event];
+    const eDate = (ov && ov.date) || s.date;
+    const eTitle = (ov && ov.title) || s.event;
+    let typed = [];
     if (ov && ov.slots) {
+      delete c.other; // the slot boxes now hold everyone, including names that used to show as 'Also'
       c.rafa = c.becky = c.donal = false;
-      ov.slots.forEach(n => { c[n.toLowerCase()] = true; });
+      ov.slots.forEach(n => {
+        const low = String(n).toLowerCase();
+        if (low==='rafa'||low==='becky'||low==='donal') c[low] = true; else if (cleanTxt(n)) typed.push(cleanTxt(n));
+      });
       whNote = '';
+    } else if (c.other) {
+      typed = c.other.split(', ').filter(Boolean);
     }
     const crew = [];
     if (c.rafa)  crew.push({name:'Rafa',  role:'Lead Eng',type:'rafa'});
     if (c.becky) crew.push({name:'Becky', role:'2nd Eng', type:'becky'});
     if (c.donal) crew.push({name:'Donal', role:'2nd Eng', type:'donal'});
     if (c.other) for (const n of c.other.split(', ')) crew.push({name:n,role:'',type:'other'});
+    if (ov && ov.slots) for (const n of typed) crew.push({name:n,role:'',type:'other'});
+    for (const n of tempNames(ov)) crew.push({name:n,role:'Temp',type:'other'});
     shows.push({
-      dt:d(s.date), dateStr:s.date, client:s.client||'gsh',
-      title:s.event, venue:s.venue||'Guinness Storehouse', status:s.status,
-      key:s.date+'|'+s.event, c,
+      dt:d(eDate), dateStr:eDate, client:s.client||'gsh',
+      title:eTitle, venue:(ov && ov.venue) || s.venue || 'Guinness Storehouse', status:s.status,
+      key:s.date+'|'+s.event, custom:s.customId||null, typed, c,
       crew, note:[s.note,whNote].filter(Boolean).join(' · '),
       hasGap: crew.length===0 || (s.need && crew.length<s.need),
       hasBecky:!!c.becky, hasRafa:!!c.rafa, hasDonal:!!c.donal,
       hasConflict:false
     });
   }
-  for (const s of kdRaw) {
-    const c = {...s.crew, ...(OVR[s.date+'|'+s.show]||{})};
+  for (const s of kdAll) {
+    const kov = OVR[s.date+'|'+s.show] || {};
+    const c = {...s.crew, ...kov};
     const crew = [];
     if (c.foh && c.foh!=='TBC') crew.push({name:c.foh, role:'FOH', type:isRafa(c.foh)?'rafa':isBecky(c.foh)?'becky':isDonal(c.foh)?'donal':'other'});
     if (c.mons && c.mons!=='TBC') crew.push({name:c.mons, role:'Mons', type:isBecky(c.mons)?'becky':isRafa(c.mons)?'rafa':isDonal(c.mons)?'donal':'other'});
     if (c.donal) crew.push({name:'Donal',role:'Patch',type:'donal'});
     else if (c.patch && c.patch!=='TBC' && c.patch!=='') crew.push({name:c.patch, role:'Patch', type:isBecky(c.patch)?'becky':isDonal(c.patch)?'donal':isRafa(c.patch)?'rafa':'other'});
     const locals = c.local ? (Array.isArray(c.local) ? c.local : [c.local]) : [];
-    for (const n of locals) crew.push({name:n,role:'Local',type:isDonal(n)?'donal':isBecky(n)?'becky':isRafa(n)?'rafa':'other'});
-    const beckyR  = isBecky(c.foh)||isBecky(c.mons)||isBecky(c.patch)||!!c.becky;
+    for (const n of locals) crew.push({name:n,role:'',type:isDonal(n)?'donal':isBecky(n)?'becky':isRafa(n)?'rafa':'other'});
+    for (const n of tempNames(kov)) crew.push({name:n,role:'Temp',type:'other'});
+    const extras = (Array.isArray(c.extra)?c.extra:[]).map(cleanTxt).filter(Boolean).slice(0,2);
+    for (const n of extras) crew.push({name:n,role:'Crew',type:isDonal(n)?'donal':isBecky(n)?'becky':isRafa(n)?'rafa':'other'});
+    const beckyR  = isBecky(c.foh)||isBecky(c.mons)||isBecky(c.patch)||!!c.becky||extras.some(isBecky);
     const missPatch = !c.patch||c.patch==='TBC';
     const missMons  = !c.mons ||c.mons ==='TBC';
     shows.push({
-      dt:d(s.date), dateStr:s.date, client:'kd',
-      title:s.show, venue:s.venue, status:s.status,
-      key:s.date+'|'+s.show, c,
+      dt:d(kov.date||s.date), dateStr:kov.date||s.date, client:'kd',
+      title:kov.title||s.show, venue:kov.venue||s.venue, status:s.status,
+      key:s.date+'|'+s.show, custom:s.customId||null, extras, c,
       crew, note:s.note||'',
       hasGap: missPatch||missMons,
-      hasBecky: beckyR, hasRafa:isRafa(c.foh)||isRafa(c.mons)||isRafa(c.patch),
-      hasDonal:!!c.donal||isDonal(c.foh)||isDonal(c.mons)||isDonal(c.patch)||locals.some(isDonal),
+      hasBecky: beckyR, hasRafa:isRafa(c.foh)||isRafa(c.mons)||isRafa(c.patch)||extras.some(isRafa),
+      hasDonal:!!c.donal||isDonal(c.foh)||isDonal(c.mons)||isDonal(c.patch)||locals.some(isDonal)||extras.some(isDonal),
       hasConflict:false
     });
   }
@@ -792,7 +1120,8 @@ function buildWarehouseEntries(shows) {
   }
 
   // Convert to array of entries
-  return Object.entries(whByDate)
+  for (const [ds,o] of Object.entries(WHOVR)) { if (o && Array.isArray(o.crew)) whByDate[ds] = o.crew.slice(0,5); }
+  return Object.entries(whByDate).filter(([ds,crew])=>crew.length)
     .map(([ds,crew])=>({dt:d(ds), dateStr:ds, isWarehouse:true, crew}))
     .sort((a,b)=>a.dt-b.dt);
 }
@@ -800,8 +1129,7 @@ function buildWarehouseEntries(shows) {
 let activeFilters = {gsh:true,kd:true,gaps:false,rafa:true,becky:true,donal:true};
 let scopeMode = 'upcoming';
 let viewMode  = 'list';
-let calYear   = TODAY.getFullYear();
-let calMonth  = TODAY.getMonth();
+let calYear = TODAY.getFullYear(), calMonth = TODAY.getMonth();
 let mYear = TODAY.getFullYear(), mMonth = TODAY.getMonth();
 
 async function exportRentman() {
@@ -822,30 +1150,32 @@ async function exportRentman() {
     rows.push([color, '', name, 'Confirmed', client, s.venue, start, end, 'Production']);
   }
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'acoustik_rentman_export.csv';
-  document.body.appendChild(a); a.click(); a.remove();
+  try {
+    const downloads = await window.claude.use('downloads');
+    if (downloads) {
+      await downloads.save({
+        filename: 'acoustik_rentman_export.csv',
+        data: new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'})
+      });
+    } else {
+      alert('Download not available in this viewer.');
+    }
+  } catch(e) {
+    console.error('Export failed:', e);
+  }
 }
 
-function setScope(m) {
-  scopeMode=m;
-  document.getElementById('btn-upcoming').classList.toggle('active',m==='upcoming');
-  document.getElementById('btn-all').classList.toggle('active',m==='all');
-  render();
-}
 function switchView(v) {
   viewMode=v;
+  document.body.dataset.view = v;
   document.getElementById('tab-list').classList.toggle('active',v==='list');
   document.getElementById('tab-cal').classList.toggle('active',v==='cal');
   document.getElementById('tab-crew').classList.toggle('active',v==='crew');
   document.getElementById('tab-edit').classList.toggle('active',v==='edit');
-  document.getElementById('tab-month').classList.toggle('active',v==='month');
   document.getElementById('list-view').style.display  = v==='list' ?'block':'none';
   document.getElementById('cal-view').style.display   = v==='cal'  ?'block':'none';
   document.getElementById('crew-view').style.display  = v==='crew' ?'block':'none';
   document.getElementById('edit-view').style.display  = v==='edit' ?'block':'none';
-  document.getElementById('month-view').style.display = v==='month'?'block':'none';
   render();
 }
 function toggleFilter(f) {
@@ -854,9 +1184,15 @@ function toggleFilter(f) {
   document.getElementById('f-'+f).classList.toggle('on',activeFilters[f]);
   render();
 }
+const CREW_KEYS = ['rafa','becky','donal'];
+function selectedPeople() { return CREW_KEYS.filter(k=>activeFilters[k]); }
+function personMode() { const n = selectedPeople().length; return n>=1 && n<3; }
 function toggleCrewFilter(w) {
-  activeFilters[w]=!activeFilters[w];
-  document.getElementById('f-'+w).classList.toggle('on',activeFilters[w]);
+  const allOn = CREW_KEYS.every(k=>activeFilters[k]);
+  if (allOn) CREW_KEYS.forEach(k=>activeFilters[k] = (k===w)); // tap a person: show just them
+  else activeFilters[w] = !activeFilters[w];
+  if (!CREW_KEYS.some(k=>activeFilters[k])) CREW_KEYS.forEach(k=>activeFilters[k]=true); // nobody selected = everyone
+  CREW_KEYS.forEach(k=>document.getElementById('f-'+k).classList.toggle('on',activeFilters[k]));
   render();
 }
 
@@ -867,7 +1203,7 @@ function filteredShows(ignoreScope) {
     if (s.client==='gsh'&&!activeFilters.gsh) return false;
     if (s.client==='kd' &&!activeFilters.kd)  return false;
     if (activeFilters.gaps&&!s.hasGap&&!s.hasConflict) return false;
-    const crewMatch=(activeFilters.rafa&&s.hasRafa)||(activeFilters.becky&&s.hasBecky)||(activeFilters.donal&&s.hasDonal)||(!s.hasRafa&&!s.hasBecky&&!s.hasDonal);
+    const crewMatch=(activeFilters.rafa&&s.hasRafa)||(activeFilters.becky&&s.hasBecky)||(activeFilters.donal&&s.hasDonal)||(!personMode()&&!s.hasRafa&&!s.hasBecky&&!s.hasDonal);
     return crewMatch;
   });
 }
@@ -896,8 +1232,9 @@ function crewTag(c) {
   const cls={rafa:'tag-rafa',becky:'tag-becky',donal:'tag-donal',other:'tag-other'}[c.type];
   return `<span class="crew-tag ${cls}">${c.role?`<span class="crew-role">${c.role}</span>`:''} ${c.name}</span>`;
 }
-function renderList(shows) {
-  if (!shows.length) return `<div class="empty"><div class="icon">📋</div><p>No shows match your filters.</p></div>`;
+function renderList(shows, range) {
+  const emptyMsg = `<div class="empty"><div class="icon">📋</div><p>${range ? 'No shows or warehouse days in this period.' : 'No shows match your filters.'}</p></div>`;
+  if (!shows.length && !range) return emptyMsg;
 
   // Build warehouse entries for the same date range as shows
   const whEntries = buildWarehouseEntries(allShows);
@@ -911,26 +1248,56 @@ function renderList(shows) {
     if (!groups[k]) groups[k]={label:MONTHS[s.dt.getMonth()]+' '+s.dt.getFullYear(),shows:[]};
     groups[k].shows.push(s);
   }
-  // Also add any warehouse-only days (no show at all that day) to the groups
-  for (const w of whEntries) {
-    const k=w.dt.getFullYear()+'-'+String(w.dt.getMonth()+1).padStart(2,'0');
-    if (viewMode==='list' && scopeMode==='upcoming' && w.dt<TODAY) continue; // no past warehouse days in Upcoming
-    if (!groups[k]) continue; // only show WH days in months that have shows
-    // Check if this date already has a show in the filtered list
-    const alreadyInGroup = groups[k].shows.some(s=>s.dateStr===w.dateStr);
-    if (!alreadyInGroup) groups[k].shows.push({...w, isWarehouseOnly:true});
+  // Every weekday with no event at all (Guinness, Candlelight or Other) is listed with who is in the warehouse.
+  if (personMode() && !activeFilters.gaps) {
+    // Selected person(s): also list the weekdays they are in the warehouse (their other working days)
+    const WH_START = new Date(2026, 10, 1), WH_END = new Date(2026, 11, 24);
+    const mine = selectedPeople().map(k=>k[0].toUpperCase()+k.slice(1));
+    const shownDates = new Set(shows.map(x=>x.dateStr));
+    let from = range ? range[0] : (scopeMode==='upcoming' ? TODAY : WH_START);
+    let to   = range ? range[1] : WH_END;
+    if (from < WH_START) from = WH_START;
+    if (to > WH_END) to = WH_END;
+    for (let dt = new Date(from); dt < to; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
+      if (dt.getDay()===0 || dt.getDay()===6) continue;
+      const ds = isoStr(dt);
+      if (shownDates.has(ds)) continue; // already on a show that day
+      const w = whByDate[ds];
+      const crew = w ? w.crew.filter(n=>mine.includes(n)) : [];
+      if (!crew.length) continue;
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), shows:[]};
+      groups[k].shows.push({dt:new Date(dt), dateStr:ds, isWarehouseOnly:true, crew});
+    }
+  } else if (!activeFilters.gaps) {
+    const WH_START = new Date(2026, 10, 1), WH_END = new Date(2026, 11, 24); // warehouse open 1 Nov – 23 Dec
+    const evDates = new Set(allShows.map(x=>x.dateStr));
+    let from = range ? range[0] : (scopeMode==='upcoming' ? TODAY : WH_START);
+    let to   = range ? range[1] : WH_END;
+    if (from < WH_START) from = WH_START;
+    if (to > WH_END) to = WH_END;
+    for (let dt = new Date(from); dt < to; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
+      const dow = dt.getDay();
+      if (dow===0 || dow===6) continue;
+      const ds = isoStr(dt);
+      if (evDates.has(ds)) continue; // days with events already show their warehouse crew in the event card
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), shows:[]};
+      const w = whByDate[ds];
+      groups[k].shows.push({dt:new Date(dt), dateStr:ds, isWarehouseOnly:true, crew:w?w.crew:[]});
+    }
   }
   // Re-sort each group by date
   for (const g of Object.values(groups)) g.shows.sort((a,b)=>a.dt-b.dt);
 
   let html='';
-  for (const g of Object.values(groups)) {
+  for (const [gk, g] of Object.entries(groups).sort((x,y)=>x[0]<y[0]?-1:1)) {
     const cards = g.shows.map(s=>{
       // Warehouse-only day (no show)
       if (s.isWarehouseOnly) {
         const dow=DAYS[s.dt.getDay()];
         const dl=String(s.dt.getDate()).padStart(2,'0')+' '+MSHORT[s.dt.getMonth()];
-        const tags = s.crew.map(name=>`<span class="crew-tag tag-warehouse">🏭 ${name}</span>`).join('');
+        const tags = s.crew.length ? s.crew.map(name=>`<span class="crew-tag tag-warehouse">🏭 ${name}</span>`).join('') : `<span class="crew-tag" style="background:var(--bg3);color:var(--fg3)">No one in the warehouse</span>`;
         return `<div class="warehouse-card">
           <div class="show-date"><div class="dow">${dow}</div><div>${dl}</div></div>
           <div><span class="warehouse-label">🏭 Warehouse</span>
@@ -968,72 +1335,91 @@ function renderList(shows) {
     }).join('');
     html+=`<div class="month-group"><div class="month-header">${g.label}</div><div class="show-list">${cards}</div></div>`;
   }
-  return html;
+  return html || emptyMsg;
 }
 
 // ── Calendar view ─────────────────────────────────────────────────────────
-function calPrev() {
-  calMonth--; if (calMonth<0){calMonth=11;calYear--;} renderCal();
-}
-function calNext() { calMonth++; if (calMonth>11){calMonth=0;calYear++;} renderCal(); }
+function calPrev()  { calMonth--; if (calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function calNext()  { calMonth++; if (calMonth>11){calMonth=0;calYear++;} renderCal(); }
+function calToday() { calYear = TODAY.getFullYear(); calMonth = TODAY.getMonth(); renderCal(); }
+function isoStr(dt) { return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
 
 function renderCal() {
   document.getElementById('cal-label').textContent = MONTHS[calMonth]+' '+calYear;
-  const shows = filteredShows();
-  // Index shows by date string
+  const shows = filteredShows(true);
   const byDate = {};
   for (const s of shows) { if (!byDate[s.dateStr]) byDate[s.dateStr]=[]; byDate[s.dateStr].push(s); }
+  const whAll = buildWarehouseEntries(allShows);
+  const todayStr = isoStr(TODAY);
+  const WK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+  // Grid starts on the Monday on/before the 1st and ends on the Sunday on/after the last day
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+  const start = new Date(calYear, calMonth, 1 - ((first.getDay()+6)%7));
+  const nDays = Math.ceil((((first.getDay()+6)%7) + last.getDate())/7)*7;
 
-  let html = DAYS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
-
-  // Prev month padding
-  for (let i=firstDay-1; i>=0; i--) {
-    html+=`<div class="cal-cell other-month"><div class="cal-day-num">${daysInPrev-i}</div></div>`;
-  }
-
-  for (let day=1; day<=daysInMonth; day++) {
-    const ds = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const isToday = ds===new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()).toISOString().slice(0,10);
-    // Actually compare properly
-    const todayStr = `${TODAY.getFullYear()}-${String(TODAY.getMonth()+1).padStart(2,'0')}-${String(TODAY.getDate()).padStart(2,'0')}`;
-    const todayCls = ds===todayStr?' today':'';
+  let html = WK.map(n=>`<div class="cal-dow">${n}</div>`).join('');
+  for (let i=0;i<nDays;i++) {
+    const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+    const ds = isoStr(dt);
+    const other = dt.getMonth()!==calMonth;
     const dayShows = byDate[ds]||[];
-    // Warehouse chip for this day
-    const whAll = buildWarehouseEntries(allShows);
     const whDay = whAll.find(w=>w.dateStr===ds);
     const whChip = whDay ? `<div class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${whDay.crew.join(' · ')}</div>` : '';
-    const evHtml = dayShows.map((s,i)=>{
-      if (i>2) return i===3?`<div class="cal-event ev-other" style="font-size:9px;padding:1px 4px;color:var(--fg3)">+${dayShows.length-3} more</div>`:'';
+    const MAXEV = 3;
+    const evHtml = dayShows.slice(0,MAXEV).map(s=>{
       let cls='ev-gsh';
       if (s.hasConflict) cls='ev-conflict';
       else if (s.hasGap) cls='ev-gap';
       else if (s.client==='kd') cls='ev-kd';
       else if (s.status==='Done') cls='ev-done';
-      const label = s.title.length>14?s.title.slice(0,13)+'…':s.title;
-      return `<div class="cal-event ${cls}" onclick="showPopup(event,'${ds}',${i})" title="${s.title}">${label}</div>`;
-    }).join('');
-    const dayDt=new Date(calYear,calMonth,day);
-    const wkndCls=(dayDt.getDay()===0||dayDt.getDay()===5||dayDt.getDay()===6)?' weekend':'';
-    html+=`<div class="cal-cell${todayCls}${wkndCls}"><div class="cal-day-num">${day}</div>${evHtml}${whChip}</div>`;
+      return `<span class="cal-event ${cls}" title="${s.title}">${s.title}</span>`;
+    }).join('') + (dayShows.length>MAXEV ? `<span class="cal-more">+${dayShows.length-MAXEV} more</span>` : '');
+    const ini = whDay ? whDay.crew.map(n=>String(n).trim()[0].toUpperCase()).join('') : '';
+    const whDot = whDay ? `<span class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${ini}</span>` : '';
+    const wknd = (dt.getDay()===0||dt.getDay()===5||dt.getDay()===6)?' weekend':'';
+    html += `<div class="cal-cell${ds===todayStr?' today':''}${wknd}${other?' other-month':''}" onclick="openDay('${ds}')"><div class="cal-day-num">${dt.getDate()}</div><div class="cal-dots">${evHtml}${whDot}</div></div>`;
   }
+  const grid = document.getElementById('cal-grid');
+  grid.classList.remove('wk');
+  grid.innerHTML = html;
+}
 
-  // Next month padding
-  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
-  for (let i=1; i <= totalCells - firstDay - daysInMonth; i++) {
-    html+=`<div class="cal-cell other-month"><div class="cal-day-num">${i}</div></div>`;
-  }
-
-  document.getElementById('cal-grid').innerHTML = html;
+// ── Day sheet (tap a day in the calendar) ──
+function closeDay() { const m = document.getElementById('day-sheet'); if (m) m.remove(); document.removeEventListener('keydown', dayKey); }
+function dayKey(e) { if (e.key==='Escape') closeDay(); }
+function openDay(ds) {
+  closeDay();
+  const dt = d(ds);
+  const shows = filteredShows(true).filter(x=>x.dateStr===ds);
+  const wh = buildWarehouseEntries(allShows).find(w=>w.dateStr===ds);
+  const stripe = x => x.hasConflict?'var(--warn)':x.hasGap?'var(--gap)':x.client==='kd'?'var(--kd-mid)':x.client==='other'?'var(--accent)':'var(--gsh-mid)';
+  const items = shows.map(x=>`<div class="day-item" style="--stripe:${stripe(x)}">
+      <div class="day-item-top"><div class="show-name">${x.title}</div>${statusPill(x)}</div>
+      <div class="show-venue">${x.venue||''}</div>
+      <div class="crew-row">${x.crew.length ? x.crew.map(crewTag).join('') : '<span class="crew-tag tag-gap">No crew assigned</span>'}</div>
+      ${x.note?`<div class="note-line">${x.note}</div>`:''}
+      ${x.conflictInfo?`<div class="note-line" style="color:var(--warn)">⚠ ${x.conflictInfo.map(c=>c.who.join('+')+' also on '+c.show).join('; ')}</div>`:''}
+      ${canWrite?`<button class="nav-btn" style="margin-top:10px" onclick="closeDay();goEdit('${encK(x.key)}')">✎ Edit</button>`:''}
+    </div>`).join('');
+  const whHtml = (dt.getDay()!==0 && dt.getDay()!==6 && dt>=new Date(2026,10,1) && dt<new Date(2026,11,24))
+    ? `<div class="day-item" style="--stripe:#4a90a4"><div class="day-item-top"><div class="show-name">🏭 Warehouse</div></div><div class="crew-row">${wh ? wh.crew.map(n=>`<span class="crew-tag tag-warehouse">${n}</span>`).join('') : '<span class="crew-tag" style="background:var(--bg3);color:var(--fg3)">No one in the warehouse</span>'}</div></div>` : '';
+  const m = document.createElement('div');
+  m.className = 'modal-back'; m.id = 'day-sheet';
+  m.innerHTML = `<div class="modal" role="dialog" aria-label="Day details">
+    <div class="modal-head"><div class="modal-title">${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dt.getDay()]} ${dt.getDate()} ${MONTHS[dt.getMonth()]}</div><button class="modal-x" onclick="closeDay()" title="Close">×</button></div>
+    ${items || (whHtml ? '' : '<div class="empty" style="padding:24px 8px">Nothing on this day.</div>')}${whHtml}
+    <div style="height:4px"></div></div>`;
+  m.addEventListener('mousedown', e => { if (e.target===m) closeDay(); });
+  document.body.appendChild(m);
+  document.addEventListener('keydown', dayKey);
 }
 
 // ── Popup ─────────────────────────────────────────────────────────────────
 function showPopup(e, dateStr, idx) {
   e.stopPropagation();
-  const shows = filteredShows();
+  const shows = filteredShows(true);
   const byDate = {};
   for (const s of shows) { if (!byDate[s.dateStr]) byDate[s.dateStr]=[]; byDate[s.dateStr].push(s); }
   const s = (byDate[dateStr]||[])[idx];
@@ -1170,7 +1556,7 @@ function showDetail(s, whCrew) {
   const wh = whCrew.length ? `<div class="dt-row"><span class="dt-k">Warehouse</span><span>${whCrew.join(', ')}</span></div>` : '';
   const note = s.note ? `<div class="dt-row"><span class="dt-k">Note</span><span>${s.note}</span></div>` : '';
   const conf = s.conflictInfo ? `<div class="dt-row" style="color:var(--warn)"><span class="dt-k">Conflict</span><span>${s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.client.toUpperCase()}: ${c.show}`).join(' · ')}</span></div>` : '';
-  const enc = encodeURIComponent(s.key);
+  const enc = encK(s.key);
   return `<div class="show-detail" onclick="event.stopPropagation()">
     <div class="dt-grid">
       <div><div class="dt-h">${full}</div>
@@ -1203,84 +1589,361 @@ function crewNames() {
 function mkSel(opts, val, kind, field, enc, blank, label) {
   if (val==='TBC') val = '';
   const list = (val && !opts.includes(val)) ? [...opts, val] : opts;
-  return `<label class="edit-field"><span>${label}</span><select data-key="${enc}" data-kind="${kind}" data-field="${field}" onchange="onCrewChange(this)"><option value="">${blank}</option>${list.map(n=>`<option${n===val?' selected':''}>${n}</option>`).join('')}</select></label>`;
+  return `<label class="edit-field"><span>${label}</span><select data-key="${enc}" data-kind="${kind}" data-field="${field}" onchange="onCrewChange(this)"${canWrite?'':' disabled'}><option value="">${blank}</option>${list.map(n=>`<option${n===val?' selected':''}>${n}</option>`).join('')}</select></label>`;
 }
 
-function onCrewChange(el) {
+function mkIn(val, kind, field, enc, blank, label, listId) {
+  if (val==='TBC' || val==null) val = '';
+  const v = String(val).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  return `<label class="edit-field"><span>${label}</span><span class="xwrap"><input class="edit-input" type="text" list="${listId}" autocomplete="off" maxlength="60" placeholder="${blank}" value="${v}" data-key="${enc}" data-kind="${kind}" data-field="${field}" onchange="onCrewChange(this)"${canWrite?'':' disabled'}>${canWrite?'<button type="button" class="xbtn" tabindex="-1" title="Remove" onclick="clearCrewBox(this)">×</button>':''}</span></label>`;
+}
+// re-render after a crew edit without losing the field the user tabbed/clicked into
+function rerenderKeepFocus() {
+  setTimeout(() => {
+    const ae = document.activeElement;
+    let keep = null;
+    if (ae && ae.closest && ae.closest('#edit-schedule') && ae.dataset && ae.dataset.key) keep = [ae.dataset.key, ae.dataset.field];
+    render();
+    if (keep) {
+      const el = [...document.querySelectorAll('#edit-schedule input[data-key]')].find(x => x.dataset.key===keep[0] && x.dataset.field===keep[1]);
+      if (el) { el.focus(); try { el.setSelectionRange(el.value.length, el.value.length); } catch(e){} }
+    }
+  }, 0);
+}
+let slotMin = {}; // slots the user has opened with + (kept on re-render, so empty ones don't vanish)
+function clearCrewBox(btn) {
+  const inp = btn.parentElement.querySelector('input');
+  if (!inp) return;
+  inp.value = '';
+  if (inp.dataset.key) onCrewChange(inp, true); else inp.focus();
+}
+function addEditSlot(btn) {
+  const row = btn.closest('.edit-row');
+  const n = row.querySelectorAll('input[data-kind="gsh"]').length;
+  if (n>=5) return;
+  slotMin[decodeURIComponent(row.dataset.key)] = n+1;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'gsh','slot'+n,row.dataset.key,'Pick or type','Crew '+(n+1),'dl-crew3'));
+  const inp = row.querySelector('input[data-field="slot'+n+'"]');
+  if (n+1>=5) cell.remove();
+  if (inp) inp.focus();
+}
+function whEditRow(ds, crew) {
+  const key = 'WH|'+ds, enc = encK(key);
+  const dt = d(ds);
+  const n = Math.min(5, Math.max(3, crew.length, slotMin[key]||0));
+  let fields = '';
+  for (let i=0;i<n;i++) fields += mkIn(crew[i]||'', 'wh','slot'+i,enc,'Pick or type','Person '+(i+1),'dl-crew3');
+  if (n<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addWhSlot(this)" title="Add another person (up to 5)">+</button></div>`;
+  const reset = WHOVR[ds] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetWh('${ds}')">↺ Reset</button>` : '';
+  return `<div class="edit-row wh-row${WHOVR[ds]?' edited':''}" data-key="${enc}">
+    <div class="edit-head"><span class="edit-date" style="min-width:90px;font-weight:600">${DAYS[dt.getDay()]} ${dt.getDate()} ${MSHORT[dt.getMonth()]}</span><span class="tag-warehouse" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px">🏭 Warehouse</span>${reset}</div>
+    <div class="edit-fields">${fields}</div>
+  </div>`;
+}
+function addWhSlot(btn) {
+  const row = btn.closest('.edit-row');
+  const n = row.querySelectorAll('input[data-kind="wh"]').length;
+  if (n>=5) return;
+  slotMin[decodeURIComponent(row.dataset.key)] = n+1;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'wh','slot'+n,row.dataset.key,'Pick or type','Person '+(n+1),'dl-crew3'));
+  const inp = row.querySelector('input[data-field="slot'+n+'"]');
+  if (n+1>=5) cell.remove();
+  if (inp) inp.focus();
+}
+function onWhChange(el, removing) {
+  const key = decodeURIComponent(el.dataset.key), ds = key.slice(3);
+  const row = el.closest('.edit-row');
+  const seen = new Set(), names = [];
+  row.querySelectorAll('input[data-kind="wh"]').forEach(x => {
+    let n = cleanTxt(x.value).replace(/,/g,' ').trim();
+    if (!n) return;
+    const low = n.toLowerCase();
+    if (low==='rafa'||low==='becky'||low==='donal') n = low[0].toUpperCase()+low.slice(1);
+    if (seen.has(low) || names.length>=5) return; seen.add(low); names.push(n);
+  });
+  slotMin[key] = removing ? Math.max(3, names.length) : Math.max(slotMin[key]||0, row.querySelectorAll('input[data-kind="wh"]').length);
+  WHOVR[ds] = {crew:names};
+  saveWh(); pushWh(ds); rerenderKeepFocus();
+}
+function resetWh(ds) { delete WHOVR[ds]; delete slotMin['WH|'+ds]; saveWh(); pushWh(ds); render(); }
+function addKdSlot(btn) {
+  const row = btn.closest('.edit-row');
+  const n = row.querySelectorAll('input[data-kind="kdx"]').length;
+  if (n>=2) return;
+  slotMin[decodeURIComponent(row.dataset.key)] = n+1;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'kdx','extra'+n,row.dataset.key,'Pick or type','Crew '+(4+n),'dl-names'));
+  const inp = row.querySelector('input[data-field="extra'+n+'"]');
+  if (n+1>=2) cell.remove();
+  if (inp) inp.focus();
+}
+function addKdModalSlot(btn) {
+  const grid = btn.closest('.modal-grid');
+  const n = grid.querySelectorAll('input[id^="add-x"]').length;
+  if (n>=2) return;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', addIn('add-x'+(n+1),'Crew '+(4+n),'add-names','Name'));
+  if (n+1>=2) cell.remove();
+  const inp = document.getElementById('add-x'+(n+1)); if (inp) inp.focus();
+}
+function addModalSlot(btn) {
+  const grid = btn.closest('.modal-grid');
+  const n = grid.querySelectorAll('input[id^="add-c"]').length;
+  if (n>=5) return;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', addIn('add-c'+(n+1),'Crew '+(n+1),'add-names','Name'));
+  if (n+1>=5) cell.remove();
+  const inp = document.getElementById('add-c'+(n+1)); if (inp) inp.focus();
+}
+function onTempClear(enc) { const key = decodeURIComponent(enc); const cur = {...(OVR[key]||{})}; delete cur.temp; if (Object.keys(cur).length) OVR[key]=cur; else delete OVR[key]; saveOVR(); allShows = buildShows(); render(); pushOvr(key); }
+function onCrewChange(el, removing) {
+  if (el.dataset.kind==='wh') return onWhChange(el, removing);
   const key = decodeURIComponent(el.dataset.key);
   if (el.dataset.kind==='gsh') {
     const row = el.closest('.edit-row');
-    const slots = [...new Set([...row.querySelectorAll('select')].map(x=>x.value).filter(Boolean))];
-    OVR[key] = {slots};
+    const seen = new Set(), slots = [];
+    row.querySelectorAll('input[data-kind="gsh"]').forEach(x => {
+      let n = cleanTxt(x.value).replace(/,/g,' ').trim();
+      if (!n) return;
+      const low = n.toLowerCase();
+      if (low==='rafa'||low==='becky'||low==='donal') n = low[0].toUpperCase()+low.slice(1);
+      if (seen.has(low) || slots.length>=5) return; seen.add(low); slots.push(n);
+    });
+    slotMin[key] = removing ? Math.max(3, slots.length) : Math.max(slotMin[key]||0, row.querySelectorAll('input[data-kind="gsh"]').length);
+    OVR[key] = {...(OVR[key]||{}), slots};
+  } else if (el.dataset.kind==='kdx') {
+    const row = el.closest('.edit-row');
+    const ex = [];
+    row.querySelectorAll('input[data-kind="kdx"]').forEach(x => {
+      const n = cleanTxt(x.value).replace(/,/g,' ').trim();
+      if (n && ex.length<2 && !ex.some(e=>e.toLowerCase()===n.toLowerCase())) ex.push(n);
+    });
+    slotMin[key] = removing ? ex.length : Math.max(slotMin[key]||0, row.querySelectorAll('input[data-kind="kdx"]').length);
+    OVR[key] = {...(OVR[key]||{}), extra:ex};
   } else {
-    OVR[key] = {...(OVR[key]||{}), [el.dataset.field]: el.value};
+    OVR[key] = {...(OVR[key]||{}), [el.dataset.field]: cleanTxt(el.value)};
   }
-  saveOVR(); allShows = buildShows(); render();
+  saveOVR(); allShows = buildShows(); pushOvr(key); rerenderKeepFocus();
 }
-function resetOne(enc) { delete OVR[decodeURIComponent(enc)]; saveOVR(); allShows = buildShows(); render(); }
-function resetAll() { OVR = {}; saveOVR(); allShows = buildShows(); render(); }
+function onMetaChange(el) {
+  const key = decodeURIComponent(el.dataset.key);
+  const val = el.value.trim();
+  if (!val) { render(); return; }
+  OVR[key] = {...(OVR[key]||{}), [el.dataset.field]: val};
+  saveOVR(); allShows = buildShows(); render(); pushOvr(key);
+}
+function todayISO() { const t=new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
+function addSel(id, label, opts, blank) {
+  return `<label class="edit-field"><span>${label}</span><select id="${id}"><option value="">${blank}</option>${opts.map(n=>`<option>${n}</option>`).join('')}</select></label>`;
+}
+function addIn(id, label, listId, ph) {
+  return `<label class="edit-field"><span>${label}</span><span class="xwrap"><input class="edit-input" type="text" id="${id}" list="${listId}" placeholder="${ph}" maxlength="60" autocomplete="off"><button type="button" class="xbtn" tabindex="-1" title="Remove" onclick="clearCrewBox(this)">×</button></span></label>`;
+}
+function addCrewHtml(type) {
+  if (type==='kd') {
+    const n = crewNames();
+    return `<div class="modal-grid">${addIn('add-foh','FOH','add-names','Name')}${addIn('add-mons','Mons','add-names','Name')}${addIn('add-patch','Patch','add-names','Name')}<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" type="button" onclick="addKdModalSlot(this)" title="Add another person (up to 5)">+</button></div></div>
+      <datalist id="add-names">${n.map(x=>`<option value="${x}"></option>`).join('')}</datalist>`;
+  }
+  return `<div class="modal-grid">${[1,2,3].map(i=>addIn('add-c'+i,'Crew '+i,'add-names','Name')).join('')}<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" type="button" onclick="addModalSlot(this)" title="Add another person (up to 5)">+</button></div></div>
+    <datalist id="add-names">${['Rafa','Becky','Donal'].map(x=>`<option value="${x}"></option>`).join('')}</datalist>
+    <div style="font-size:10px;color:var(--fg3);margin-top:6px">Any other name typed here is a one-off for this event only.</div>`;
+}
+function onAddType() {
+  const t = document.getElementById('add-type').value;
+  document.getElementById('add-crew').innerHTML = addCrewHtml(t);
+  const v = document.getElementById('add-venue');
+  if (v && (!v.value || v.dataset.auto==='1')) { v.value = t==='gsh' ? 'Guinness Storehouse' : ''; v.dataset.auto='1'; }
+}
+function closeAdd() {
+  const m = document.getElementById('add-modal'); if (m) m.remove();
+  document.removeEventListener('keydown', addKey);
+}
+function addKey(e) { if (e.key==='Escape') closeAdd(); }
+function openAdd() {
+  if (document.getElementById('add-modal')) return;
+  const venues = [...new Set(allShows.map(x=>x.venue).filter(v=>v && v!=='TBC'))].sort();
+  const m = document.createElement('div');
+  m.className = 'modal-back'; m.id = 'add-modal';
+  m.innerHTML = `<div class="modal" role="dialog" aria-label="Add event">
+    <div class="modal-head"><div class="modal-title">Add event</div><button class="modal-x" onclick="closeAdd()" title="Close">×</button></div>
+    <div class="modal-grid">
+      <label class="edit-field"><span>Date</span><input class="edit-input" type="date" id="add-date" value="${todayISO()}"></label>
+      <label class="edit-field"><span>Type</span><select id="add-type" onchange="onAddType()"><option value="gsh">Guinness Storehouse</option><option value="kd">Candlelight</option><option value="other">Other event</option></select></label>
+      <label class="edit-field full"><span>Event name</span><input class="edit-input" type="text" id="add-title" placeholder="Event name" maxlength="120"></label>
+      <label class="edit-field full"><span>Venue</span><input class="edit-input" type="text" id="add-venue" list="add-venue-list" placeholder="Venue" maxlength="120" data-auto="1" value="Guinness Storehouse" oninput="this.dataset.auto='0'"></label>
+      <label class="edit-field"><span>Status</span><select id="add-status"><option>Booked</option><option>Planned</option><option>TBC</option></select></label>
+    </div>
+    <div class="modal-sub">Crew</div>
+    <div id="add-crew">${addCrewHtml('gsh')}</div>
+    <datalist id="add-venue-list">${venues.map(v=>`<option value="${v.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>
+    <div class="modal-actions"><span class="modal-err" id="add-err"></span><button class="nav-btn" onclick="closeAdd()">Cancel</button><button class="nav-btn btn-primary" onclick="saveAdd()">Save</button></div>
+  </div>`;
+  m.addEventListener('mousedown', e => { if (e.target===m) closeAdd(); });
+  document.body.appendChild(m);
+  document.addEventListener('keydown', addKey);
+  document.getElementById('add-title').focus();
+}
+function saveAdd() {
+  const g = id => (document.getElementById(id)||{}).value || '';
+  const err = document.getElementById('add-err');
+  const type = g('add-type'), date = g('add-date'), title = cleanTxt(g('add-title')), venue = cleanTxt(g('add-venue'));
+  if (!date) { err.textContent = 'Please choose a date.'; return; }
+  if (!title) { err.textContent = 'Please enter an event name.'; return; }
+  let crew = {};
+  if (type==='kd') {
+    if (cleanTxt(g('add-foh'))) crew.foh = cleanTxt(g('add-foh'));
+    if (cleanTxt(g('add-mons'))) crew.mons = cleanTxt(g('add-mons'));
+    if (cleanTxt(g('add-patch'))) crew.patch = cleanTxt(g('add-patch'));
+    const ex = [g('add-x1'),g('add-x2')].map(v=>cleanTxt(v).replace(/,/g,' ').trim()).filter(Boolean);
+    if (ex.length) crew.extra = ex;
+  } else {
+    const others = [];
+    [1,2,3,4,5].map(i=>g('add-c'+i)).map(v=>cleanTxt(v).replace(/,/g,' ').trim()).filter(Boolean).forEach(n => {
+      const low = n.toLowerCase();
+      if (low==='rafa'||low==='becky'||low==='donal') crew[low] = true;
+      else if (!others.some(o=>o.toLowerCase()===low)) others.push(n);
+    });
+    if (others.length) crew.other = others.join(', ');
+  }
+  const ev = { id:'ce-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), client:type, date, title, venue, status:g('add-status')||'Booked', crew };
+  CUSTOM = [...CUSTOM, ev]; saveCustom();
+  if (DB) Promise.resolve(DB.collection('customEvents').doc(ev.id).set(ev)).catch(()=>{});
+  closeAdd(); allShows = buildShows();
+  if (d(date) < TODAY) editPast = true; // so a past event you just added is visible in the Edit tab
+  render();
+}
+let delArm = null;
+function delCustom(btn, id) {
+  if (delArm !== id) { delArm = id; btn.textContent = 'Click again to delete'; setTimeout(()=>{ if (delArm===id) { delArm=null; if (btn.isConnected) btn.textContent='🗑 Delete'; } }, 3000); return; }
+  delArm = null;
+  CUSTOM = CUSTOM.filter(x=>x.id!==id); saveCustom();
+  if (DB) Promise.resolve(DB.collection('customEvents').doc(id).delete()).catch(()=>{});
+  allShows = buildShows(); render();
+}
+function onTempChange(el) {
+  const key = decodeURIComponent(el.dataset.key);
+  const val = tempNames({temp:el.value}).join(', ');
+  const cur = {...(OVR[key]||{})};
+  if (val) cur.temp = val; else delete cur.temp;
+  if (Object.keys(cur).length) OVR[key] = cur; else delete OVR[key];
+  saveOVR(); allShows = buildShows(); render(); pushOvr(key);
+}
+function resetOne(enc) { const k = decodeURIComponent(enc); delete OVR[k]; saveOVR(); allShows = buildShows(); render(); pushOvr(k); }
+function resetAll() { const ks = Object.keys(OVR); OVR = {}; saveOVR(); allShows = buildShows(); render(); ks.forEach(k => pushOvr(k)); }
 
+let editPast = false;
+function toggleEditPast() { editPast = !editPast; render(); }
 function renderEdit() {
+  const showPast = editPast || scopeMode==='all';
   const names = crewNames();
   const crew3 = ['Rafa','Becky','Donal'];
-  let shows = allShows.filter(s => scopeMode==='all' || (s.dt>=TODAY && s.status!=='Done'));
+  let shows = allShows.filter(s => showPast || (s.dt>=TODAY && s.status!=='Done'));
   shows = shows.filter(s => s.client==='kd' ? activeFilters.kd : activeFilters.gsh);
   const nOvr = Object.keys(OVR).length;
   const groups = {};
   for (const s of shows) {
     const k = s.dt.getFullYear()+'-'+String(s.dt.getMonth()+1).padStart(2,'0');
     if (!groups[k]) groups[k] = {label:MONTHS[s.dt.getMonth()]+' '+s.dt.getFullYear(), rows:[]};
-    groups[k].rows.push(s);
+    groups[k].rows.push({s, dt:s.dt, o:0});
   }
-  let html = `<div class="edit-bar"><span>Choose crew from the dropdowns. Changes update every tab and are saved on this device.</span>${nOvr?`<button class="nav-btn" onclick="resetAll()">Reset all edits (${nOvr})</button>`:''}</div>`;
-  for (const g of Object.values(groups)) {
+  // Warehouse days (weekdays 1 Nov – 23 Dec): editable crew for each day
+  {
+    const WH_A = new Date(2026, 10, 1), WH_B = new Date(2026, 11, 24);
+    let from = showPast ? WH_A : TODAY; if (from < WH_A) from = WH_A;
+    const whMap = {}; buildWarehouseEntries(allShows).forEach(w => whMap[w.dateStr] = w.crew);
+    const evDates = new Set(allShows.map(x=>x.dateStr));
+    for (let dt = new Date(from); dt < WH_B; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
+      if (dt.getDay()===0 || dt.getDay()===6) continue;
+      const ds = isoStr(dt);
+      if (evDates.has(ds) && !(whMap[ds]||[]).length && !WHOVR[ds]) continue; // event day, nobody in warehouse: no row
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), rows:[]};
+      groups[k].rows.push({wh:ds, dt:new Date(dt), o:1, crew:whMap[ds]||[]});
+    }
+    for (const g of Object.values(groups)) g.rows.sort((a,b)=>(a.dt-b.dt)||(a.o-b.o));
+  }
+  let html = `<div class="edit-bar"><span>${canWrite ? 'Edit the date, title, location or crew, and who is in the warehouse each day. Changes save automatically and update live for everyone using this planner.' : 'View only — you need Contributor access to make changes.'}</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip${showPast?' on':''}" style="${showPast?'border-color:var(--accent);color:var(--accent);background:var(--accent-bg)':''}" onclick="toggleEditPast()" ${scopeMode==='all'?'disabled title="Already showing all dates (All 2026–27)"':''}>🕘 Past dates</button>${canWrite?`<button class="nav-btn btn-primary" onclick="openAdd()">+ Add</button>`:''}${nOvr?`<button class="nav-btn" onclick="resetAll()">Reset all edits (${nOvr})</button>`:''}</span></div>`;
+  for (const [gk, g] of Object.entries(groups).sort((x,y)=>x[0]<y[0]?-1:1)) {
     html += `<div class="month-group"><div class="month-header">${g.label}</div>`;
-    for (const s of g.rows) {
-      const enc = encodeURIComponent(s.key);
+    for (const it of g.rows) {
+      if (it.wh) { html += whEditRow(it.wh, it.crew); continue; }
+      const s = it.s;
+      const enc = encK(s.key);
       const isKd = s.client==='kd';
       const badge = s.client==='gsh' ? `<span class="client-badge badge-gsh">GSH</span>` : s.client==='other' ? `<span class="client-badge badge-other">Event</span>` : `<span class="client-badge badge-kd">Candlelight</span>`;
       let fields = '', extra = '';
       if (isKd) {
-        fields = mkSel(names, s.c.foh, 'kd','foh',enc,'TBC','FOH') + mkSel(names, s.c.mons, 'kd','mons',enc,'TBC','Mons') + mkSel(names, s.c.patch, 'kd','patch',enc,'TBC','Patch');
+        fields = mkIn(s.c.foh, 'kd','foh',enc,'TBC','FOH','dl-names') + mkIn(s.c.mons, 'kd','mons',enc,'TBC','Mons','dl-names') + mkIn(s.c.patch, 'kd','patch',enc,'TBC','Patch','dl-names');
+        const ex = s.extras||[];
+        const nEx = Math.min(2, Math.max(ex.length, slotMin[s.key]||0));
+        for (let i=0;i<nEx;i++) fields += mkIn(ex[i]||'', 'kdx','extra'+i,enc,'Pick or type','Crew '+(4+i),'dl-names');
+        if (nEx<2 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addKdSlot(this)" title="Add another person (up to 5)">+</button></div>`;
         const loc = (s.c.local ? (Array.isArray(s.c.local)?s.c.local:[s.c.local]) : []);
-        if (loc.length) extra = `<div class="edit-extra">Local: ${loc.join(', ')}</div>`;
       } else {
-        const cur = crew3.filter(n => s.c[n.toLowerCase()]);
-        for (let i=0;i<3;i++) fields += mkSel(crew3, cur[i]||'', 'gsh','slot'+i,enc,'—','Crew '+(i+1));
-        if (s.c.other) extra = `<div class="edit-extra">Also: ${s.c.other}</div>`;
+        const cur = crew3.filter(n => s.c[n.toLowerCase()]).concat(s.typed||[]).slice(0,5);
+        const nSlots = Math.min(5, Math.max(3, cur.length, slotMin[s.key]||0));
+        for (let i=0;i<nSlots;i++) fields += mkIn(cur[i]||'', 'gsh','slot'+i,enc,'Pick or type','Crew '+(i+1),'dl-crew3');
+        if (nSlots<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addEditSlot(this)" title="Add another person (up to 5)">+</button></div>`;
       }
+      const legacyTmp = (OVR[s.key] && OVR[s.key].temp) ? `<div class="edit-extra">Temp: ${OVR[s.key].temp} <button class="nav-btn" style="padding:1px 8px;font-size:10px" onclick="onTempClear('${enc}')"${canWrite?'':' disabled'}>clear</button></div>` : '';
       const flag = s.hasConflict ? `<span class="status-pill pill-conflict">⚠ Conflict</span>` : s.hasGap ? `<span class="status-pill pill-gap">⚠ Gap</span>` : '';
       const conf = s.conflictInfo ? `<div class="edit-extra" style="color:var(--warn)">⚠ ${s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.client.toUpperCase()}: ${c.show}`).join(' · ')}</div>` : '';
+      const del = (s.custom && canWrite) ? `<button class="nav-btn btn-danger" onclick="delCustom(this,'${s.custom}')">🗑 Delete</button>` : '';
       const reset = OVR[s.key] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetOne('${enc}')">↺ Reset</button>` : '';
       html += `<div class="edit-row${s.hasConflict?' has-conflict':s.hasGap?' has-gap':''}${OVR[s.key]?' edited':''}" data-key="${enc}">
-        <div class="edit-head"><span class="edit-date">${DAYS[s.dt.getDay()]} ${String(s.dt.getDate()).padStart(2,'0')} ${MSHORT[s.dt.getMonth()]}</span><span class="edit-title">${s.title}</span>${badge}<span class="edit-venue">${s.venue}</span>${flag}${reset}</div>
-        <div class="edit-fields">${fields}</div>${extra}${conf}
+        <div class="edit-head"><input class="edit-input" type="date" value="${s.dateStr}" data-key="${enc}" data-field="date" onchange="onMetaChange(this)"${canWrite?'':' disabled'}><input class="edit-input edit-title-input" type="text" value="${s.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="title" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${badge}<input class="edit-input edit-venue-input" type="text" list="venue-list" placeholder="Location" value="${String(s.venue).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="venue" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${flag}${reset}${del}</div>
+        <div class="edit-fields">${fields}</div>${extra}${legacyTmp}${conf}
       </div>`;
     }
     html += `</div>`;
   }
+  html += `<datalist id="dl-crew3">${crew3.map(n=>`<option value="${n}"></option>`).join('')}</datalist><datalist id="dl-names">${names.map(n=>`<option value="${n.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>`;
+  const venues = [...new Set(allShows.map(x=>x.venue).filter(v=>v && v!=='TBC'))].sort();
+  html += `<datalist id="venue-list">${venues.map(v=>`<option value="${String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>`;
   document.getElementById('edit-schedule').innerHTML = shows.length ? html : `<div class="empty"><div class="icon">📋</div><p>No shows to edit.</p></div>`;
 }
 
-// ── Month navigation ──
-function mPrev() { mMonth--; if (mMonth<0) { mMonth=11; mYear--; } render(); }
-function mNext() { mMonth++; if (mMonth>11) { mMonth=0; mYear++; } render(); }
-function mToday() { mYear = TODAY.getFullYear(); mMonth = TODAY.getMonth(); render(); }
-function renderMonth() {
-  document.getElementById('month-label').textContent = MONTHS[mMonth]+' '+mYear;
-  const shows = filteredShows(true).filter(s => s.dt.getFullYear()===mYear && s.dt.getMonth()===mMonth);
-  document.getElementById('month-schedule').innerHTML = shows.length
-    ? renderList(shows)
-    : `<div class="empty"><div class="icon">📅</div><p>No shows in ${MONTHS[mMonth]} ${mYear}.</p></div>`;
+// ── Period filter (All tab): all dates / by week (Mon–Sun) / by month ──
+let periodMode = 'all';
+let periodAnchor = new Date(TODAY);
+function periodRange() {
+  const a = periodAnchor;
+  if (periodMode==='week') {
+    const st = new Date(a.getFullYear(), a.getMonth(), a.getDate() - ((a.getDay()+6)%7));
+    return [st, new Date(st.getFullYear(), st.getMonth(), st.getDate()+7)];
+  }
+  const st = new Date(a.getFullYear(), a.getMonth(), 1);
+  return [st, new Date(st.getFullYear(), st.getMonth()+1, 1)];
+}
+function setPeriod(v) { periodMode = v; periodAnchor = new Date(TODAY); render(); }
+function periodStep(n) {
+  const a = periodAnchor;
+  periodAnchor = periodMode==='week' ? new Date(a.getFullYear(), a.getMonth(), a.getDate()+7*n)
+                                     : new Date(a.getFullYear(), a.getMonth()+n, 1);
+  render();
+}
+function periodToday() { periodAnchor = new Date(TODAY); render(); }
+function periodLabel() {
+  const [st, en] = periodRange();
+  if (periodMode==='month') return MONTHS[st.getMonth()]+' '+st.getFullYear();
+  const e = new Date(en.getFullYear(), en.getMonth(), en.getDate()-1);
+  if (st.getFullYear()!==e.getFullYear()) return `${st.getDate()} ${MSHORT[st.getMonth()]} ${st.getFullYear()} – ${e.getDate()} ${MSHORT[e.getMonth()]} ${e.getFullYear()}`;
+  if (st.getMonth()!==e.getMonth()) return `${st.getDate()} ${MSHORT[st.getMonth()]} – ${e.getDate()} ${MSHORT[e.getMonth()]} ${e.getFullYear()}`;
+  return `${st.getDate()} – ${e.getDate()} ${MONTHS[e.getMonth()]} ${e.getFullYear()}`;
 }
 
 function render() {
-  const shows = filteredShows();
+  const usePeriod = viewMode==='list' && periodMode!=='all';
+  let shows = filteredShows(usePeriod);
+  if (usePeriod) { const [st,en] = periodRange(); shows = shows.filter(x => x.dt>=st && x.dt<en); }
   renderStats(shows);
   if (viewMode==='list') {
-    document.getElementById('schedule').innerHTML = renderList(shows);
-  } else if (viewMode==='month') {
-    renderMonth();
+    document.getElementById('period-nav').style.display = usePeriod ? 'inline-flex' : 'none';
+    if (usePeriod) document.getElementById('period-label').textContent = periodLabel();
+    document.getElementById('schedule').innerHTML = renderList(shows, usePeriod ? periodRange() : null);
   } else if (viewMode==='cal') {
     renderCal();
   } else if (viewMode==='edit') {
@@ -1299,37 +1962,10 @@ function toggleTheme() {
 }
 
 // init
+document.body.dataset.view = 'list';
 document.getElementById('list-view').style.display='block';
 document.getElementById('cal-view').style.display='none';
 render();
 </script>
 
-
-<style>
-  /* App-style layout on phones: bottom tab bar */
-  html { -webkit-tap-highlight-color:transparent; }
-  body { overscroll-behavior-y:contain; }
-  @media (max-width:700px) {
-    body { padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)); }
-    .header-nav { margin-left:0; width:100%; }
-    .view-tabs {
-      position:fixed; left:0; right:0; bottom:0; z-index:150; border-radius:0; gap:0;
-      background:var(--bg2); border-top:1px solid var(--border); box-shadow:0 -2px 8px rgba(0,0,0,.08);
-      padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));
-    }
-    .view-tab { flex:1; padding:12px 4px; font-size:13px; border-radius:8px; }
-    .view-tab.active { background:var(--accent-bg); color:var(--accent); box-shadow:none; }
-    .nav-btn, .chip { min-height:36px; }
-    .summary-row { grid-template-columns:repeat(4,1fr); gap:6px; margin:10px 0; }
-    .stat-card { padding:8px; } .stat-card .sub { display:none; } .stat-card .val { font-size:18px; }
-    .legend { display:none; }
-    .filters { flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; }
-    .chip { white-space:nowrap; flex-shrink:0; }
-    .edit-field select { font-size:16px; } /* stops iOS zoom-on-focus */
-  }
-</style>
-
-<script>
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{})); }
-</script>
 </body></html>
