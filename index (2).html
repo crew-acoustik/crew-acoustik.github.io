@@ -1,0 +1,2057 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Acoustik Crew Planner (Copy)</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --bg: #f7f7f6; --bg2: #ffffff; --bg3: #eeede9; --border: #dddbd4;
+    --fg: #1a1916; --fg2: #5a5850; --fg3: #8a8778;
+    --accent: #d4500a; --accent-bg: #fdf0ea;
+    --gsh: #1a5c3a; --gsh-bg: #eaf4ee; --gsh-mid: #2e7d52;
+    --kd: #1a3a6b; --kd-bg: #eaf0fa; --kd-mid: #2952a3;
+    --warn: #c47e00; --warn-bg: #fef8e6;
+    --ok: #2d7a3a; --ok-bg: #edf7ee;
+    --gap: #b5292e; --gap-bg: #fdecea;
+    --done: #888; --done-bg: #f0f0ed;
+    --rafa: #1a5c3a; --becky: #6b2d8b; --donal: #c47e00;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08); --radius: 8px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#131210;--bg2:#1e1c18;--bg3:#2a2820;--border:#38352c;
+      --fg:#f0ede6;--fg2:#a09b8e;--fg3:#6a6558;
+      --accent:#e86a28;--accent-bg:#2a1a0e;
+      --gsh:#4db87a;--gsh-bg:#0f2018;--gsh-mid:#3a9662;
+      --kd:#7ab0f0;--kd-bg:#0d1a2e;--kd-mid:#5090d8;
+      --warn:#e8a020;--warn-bg:#251a06;
+      --ok:#5cc46e;--ok-bg:#0d1f10;
+      --gap:#e05a5e;--gap-bg:#200d0d;
+      --done:#555;--done-bg:#1a1916;
+      --rafa:#4db87a;--becky:#c080f0;--donal:#e8a020;
+      --shadow:0 1px 3px rgba(0,0,0,0.3);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#131210;--bg2:#1e1c18;--bg3:#2a2820;--border:#38352c;
+    --fg:#f0ede6;--fg2:#a09b8e;--fg3:#6a6558;
+    --accent:#e86a28;--accent-bg:#2a1a0e;
+    --gsh:#4db87a;--gsh-bg:#0f2018;--gsh-mid:#3a9662;
+    --kd:#7ab0f0;--kd-bg:#0d1a2e;--kd-mid:#5090d8;
+    --warn:#e8a020;--warn-bg:#251a06;
+    --ok:#5cc46e;--ok-bg:#0d1f10;
+    --gap:#e05a5e;--gap-bg:#200d0d;
+    --done:#555;--done-bg:#1a1916;
+    --rafa:#4db87a;--becky:#c080f0;--donal:#e8a020;
+    --shadow:0 1px 3px rgba(0,0,0,0.3);
+    color-scheme:dark;
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg); color:var(--fg);
+    font-size:14px; line-height:1.5;
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-block:0 32px; min-width:0;
+  }
+
+  /* Header */
+  .header {
+    background:var(--bg2); border-bottom:1px solid var(--border);
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:100;
+    box-shadow:var(--shadow);
+    padding:12px max(16px,env(safe-area-inset-left,0px));
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    margin-left:max(-16px,calc(-1 * env(safe-area-inset-left,0px)));
+    margin-right:max(-16px,calc(-1 * env(safe-area-inset-right,0px)));
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .logo { font-size:18px; font-weight:700; color:var(--accent); letter-spacing:-0.5px; }
+  .logo span { color:var(--fg2); font-weight:400; font-size:12px; margin-left:4px; }
+  .header-nav { display:flex; gap:4px; margin-left:auto; align-items:center; flex-wrap:wrap; }
+  .nav-btn {
+    padding:5px 12px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--fg2); cursor:pointer; font-size:12px;
+    font-family:inherit; transition:all 0.15s;
+  }
+  .nav-btn:hover { background:var(--bg3); color:var(--fg); }
+  .nav-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .theme-btn {
+    padding:5px 9px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--fg2); cursor:pointer; font-size:15px;
+    font-family:inherit;
+  }
+
+  /* View tabs */
+  .view-tabs {
+    display:flex; gap:4px; background:var(--bg3);
+    border-radius:8px; padding:3px;
+  }
+  .view-tab {
+    padding:4px 14px; border-radius:6px; border:none;
+    background:transparent; color:var(--fg2); cursor:pointer; font-size:12px;
+    font-family:inherit; font-weight:500; transition:all 0.15s;
+  }
+  .view-tab.active { background:var(--bg2); color:var(--fg); box-shadow:var(--shadow); }
+
+  /* Stats */
+  .summary-row {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:10px; margin:18px 0 14px;
+  }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; }
+  .stat-card .label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--fg3); margin-bottom:3px; }
+  .stat-card .val { font-size:20px; font-weight:700; line-height:1; }
+  .stat-card .sub { font-size:10px; color:var(--fg2); margin-top:2px; }
+  .stat-gsh .val { color:var(--gsh-mid); } .stat-kd .val { color:var(--kd-mid); }
+  .stat-gap .val { color:var(--gap); } .stat-conflict .val { color:var(--warn); }
+
+  /* Filters */
+  .filters { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+  .filter-label { font-size:11px; color:var(--fg3); font-weight:500; }
+  .chip {
+    padding:3px 10px; border-radius:20px; border:1px solid var(--border);
+    background:var(--bg2); color:var(--fg2); cursor:pointer; font-size:11px;
+    font-family:inherit; font-weight:500; transition:all 0.15s;
+  }
+  .chip:hover { border-color:var(--fg3); color:var(--fg); }
+  .chip.on { border-color:currentColor; }
+  .chip.gsh.on  { background:var(--gsh-bg); color:var(--gsh); }
+  .chip.kd.on   { background:var(--kd-bg);  color:var(--kd); }
+  .chip.gaps.on { background:var(--gap-bg); color:var(--gap); }
+  .chip.crew-rafa.on  { background:#e6f4ec; color:var(--rafa); }
+  .chip.crew-becky.on { background:#f3eaf9; color:var(--becky); }
+  .chip.crew-donal.on { background:var(--warn-bg); color:var(--donal); }
+
+  /* ── LIST VIEW ── */
+  .month-group { margin-bottom:10px; }
+  .month-header {
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--fg3); padding:8px 0 5px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .month-header::after { content:''; flex:1; height:1px; background:var(--border); }
+  .show-list { display:flex; flex-direction:column; gap:5px; }
+  .show-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+    padding:10px 12px;
+    display:grid; grid-template-columns:82px 1fr auto;
+    gap:6px 10px; align-items:start; box-shadow:var(--shadow);
+    border-left:4px solid transparent; transition:box-shadow 0.15s;
+  }
+  .show-card:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  .show-card.client-gsh { border-left-color:var(--gsh); }
+  .show-card.client-kd  { border-left-color:var(--kd); }
+  .show-card.client-other { border-left-color:var(--accent); }
+  .show-card.has-gap    { border-left-color:var(--gap); }
+  .show-card.has-conflict { border-left-color:var(--warn); }
+  .show-card.status-done  { opacity:0.5; }
+  .show-date { font-family:'DM Mono',monospace; font-size:11px; color:var(--fg2); display:flex; flex-direction:column; gap:1px; }
+  .show-date .dow { font-size:9px; text-transform:uppercase; letter-spacing:0.08em; color:var(--fg3); }
+  .show-date .dow.is-weekend { color:var(--accent); font-weight:700; }
+  .show-main { min-width:0; }
+  .show-title-row { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .show-name { font-weight:600; font-size:13px; }
+  .client-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:2px 6px; border-radius:4px; }
+  .badge-gsh { background:var(--gsh-bg); color:var(--gsh); }
+  .badge-kd  { background:var(--kd-bg);  color:var(--kd); }
+  .badge-other { background:var(--accent-bg); color:var(--accent); }
+  .show-venue { font-size:11px; color:var(--fg2); margin-top:1px; }
+  .crew-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:6px; }
+  .crew-tag { font-size:10px; font-weight:500; padding:2px 7px; border-radius:4px; display:flex; align-items:center; gap:3px; }
+  .crew-role { font-size:8px; text-transform:uppercase; letter-spacing:0.06em; opacity:0.65; }
+  .tag-rafa  { background:var(--gsh-bg); color:var(--rafa); }
+  .tag-becky { background:#f3eaf9; color:var(--becky); }
+  .tag-donal { background:var(--warn-bg); color:var(--donal); }
+  .tag-other { background:var(--bg3); color:var(--fg2); }
+  .tag-gap   { background:var(--gap-bg); color:var(--gap); font-style:italic; }
+  .flags { display:flex; flex-direction:column; gap:3px; align-items:flex-end; }
+  .status-pill { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; padding:2px 7px; border-radius:10px; white-space:nowrap; }
+  .pill-booked  { background:var(--ok-bg);   color:var(--ok); }
+  .pill-tbc     { background:var(--warn-bg);  color:var(--warn); }
+  .pill-planned { background:var(--kd-bg);    color:var(--kd-mid); }
+  .pill-done    { background:var(--done-bg);  color:var(--done); }
+  .pill-gap     { background:var(--gap-bg);   color:var(--gap); }
+  .pill-conflict{ background:var(--warn-bg);  color:var(--warn); }
+  .note-line { font-size:10px; color:var(--fg3); margin-top:3px; font-style:italic; }
+
+  /* Expandable cards */
+  .show-card { cursor:pointer; }
+  .chev { font-size:11px; color:var(--fg3); transition:transform .15s; }
+  .show-card.open .chev { transform:rotate(180deg); }
+  .show-detail { display:none; grid-column:1/-1; border-top:1px dashed var(--border); padding-top:10px; margin-top:2px; font-size:12px; cursor:default; }
+  .show-card.open .show-detail { display:block; }
+  .dt-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:10px; }
+  @media (max-width:600px) { .dt-grid { grid-template-columns:1fr; } }
+  .dt-h { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--fg3); margin-bottom:5px; }
+  .dt-row { display:flex; gap:8px; padding:2px 0; }
+  .dt-k { width:70px; flex-shrink:0; color:var(--fg3); font-size:11px; }
+
+  /* Edit tab */
+  .edit-bar { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:8px 12px; margin-bottom:12px; font-size:12px; color:var(--fg2); }
+  .edit-row { background:var(--bg2); border:1px solid var(--border); border-left:4px solid var(--border); border-radius:var(--radius); padding:10px 12px; margin-bottom:6px; box-shadow:var(--shadow); }
+  .edit-row.has-gap { border-left-color:var(--gap); }
+  .edit-row.has-conflict { border-left-color:var(--warn); }
+  .edit-row.flash { outline:2px solid var(--accent); }
+  .edit-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .edit-date { font-family:'DM Mono',monospace; font-size:11px; color:var(--fg2); min-width:62px; }
+  .edit-title { font-weight:600; font-size:13px; }
+  .edit-venue { font-size:11px; color:var(--fg2); }
+  .edit-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
+  .edit-field { display:flex; flex-direction:column; gap:2px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--fg3); }
+  .edit-field select { font:inherit; font-size:13px; font-weight:500; text-transform:none; letter-spacing:0; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); }
+  .edit-extra { font-size:11px; color:var(--fg2); margin-top:6px; }
+  .edit-input { font:inherit; font-size:13px; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); }
+  .edit-title-input { flex:1; min-width:140px; font-weight:600; }
+  .btn-primary { background:var(--accent)!important; border-color:var(--accent)!important; color:#fff!important; }
+  .btn-danger { color:var(--gap)!important; border-color:var(--gap)!important; }
+  .modal-back { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:300; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal { background:var(--bg2); color:var(--fg); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 8px 32px rgba(0,0,0,0.28); width:100%; max-width:460px; max-height:90vh; overflow:auto; padding:16px; }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .modal-title { font-weight:700; font-size:15px; }
+  .modal-x { cursor:pointer; color:var(--fg3); font-size:20px; line-height:1; background:none; border:none; font-family:inherit; }
+  .modal-x:hover { color:var(--fg); }
+  .modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .modal-grid .full { grid-column:1/-1; }
+  .modal .edit-field .edit-input, .modal .edit-field select { width:100%; font-size:13px; }
+  .xwrap { position:relative; display:block; }
+  .xwrap .edit-input { width:100%; padding-right:24px; }
+  .xbtn { position:absolute; top:50%; right:4px; transform:translateY(-50%); width:18px; height:18px; line-height:16px; padding:0; border:none; border-radius:50%; background:transparent; color:var(--fg3); font-size:15px; cursor:pointer; font-family:inherit; text-transform:none; letter-spacing:0; }
+  .xbtn:hover { background:var(--gap-bg); color:var(--gap); }
+  .xwrap input:placeholder-shown + .xbtn { display:none; }
+  .slot-plus button { align-self:flex-start; min-width:38px; font-size:15px; padding:4px 10px; }
+  .modal-sub { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--fg3); margin:14px 0 6px; }
+  .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; align-items:center; }
+  .modal-err { color:var(--gap); font-size:11px; margin-right:auto; }
+  @media (max-width:700px) { .modal .edit-field .edit-input, .modal .edit-field select { font-size:16px; } .modal-grid { grid-template-columns:1fr; } }
+  .edit-venue-input { flex:1; min-width:120px; max-width:220px; font-size:12px; color:var(--fg2); }
+  @media (max-width:700px) { .edit-input { font-size:16px; } }
+
+  /* Warehouse duty entries */
+  .warehouse-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+    padding:7px 12px; display:grid; grid-template-columns:82px 1fr;
+    gap:4px 10px; align-items:center; opacity:0.72;
+    border-left:4px solid #4a90a4;
+  }
+  .warehouse-label { font-size:11px; color:#4a90a4; font-weight:600; letter-spacing:0.04em; }
+  .warehouse-crew  { display:flex; gap:5px; flex-wrap:wrap; }
+  .tag-warehouse   { background:#e8f4f7; color:#2e6b7e; font-size:10px; font-weight:500; padding:2px 7px; border-radius:4px; }
+  @media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) {
+    .tag-warehouse { background:#1a3a42; color:#7ec8d8; }
+  }}
+  :root[data-theme="dark"] .tag-warehouse { background:#1a3a42; color:#7ec8d8; }
+
+  /* Crew view */
+  .crew-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:4px; }
+  @media(max-width:700px){ .crew-grid { grid-template-columns:1fr; } }
+  .crew-panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .crew-panel-header { padding:10px 14px; font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px; }
+  .crew-panel-header.rafa-hdr  { background:var(--gsh-bg);  color:var(--rafa); border-bottom:1px solid var(--border); }
+  .crew-panel-header.becky-hdr { background:#f3eaf9; color:var(--becky); border-bottom:1px solid var(--border); }
+  .crew-panel-header.donal-hdr { background:var(--warn-bg); color:var(--donal); border-bottom:1px solid var(--border); }
+  .crew-week { border-bottom:1px solid var(--border); }
+  .crew-week:last-child { border-bottom:none; }
+  .crew-week-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--fg3); padding:6px 14px 2px; }
+  .crew-day { display:flex; align-items:center; gap:7px; padding:4px 14px; font-size:11px; }
+  .crew-day:hover { background:var(--bg3); }
+  .crew-day-date { font-family:'DM Mono',monospace; width:48px; color:var(--fg2); flex-shrink:0; }
+  .crew-day-dow  { width:24px; font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:var(--fg3); flex-shrink:0; }
+  .crew-day-pill { font-size:10px; font-weight:600; padding:2px 8px; border-radius:4px; white-space:nowrap; }
+  .pill-gsh  { background:var(--gsh-bg); color:var(--gsh); }
+  .pill-kd   { background:var(--kd-bg);  color:var(--kd); }
+  .pill-wh   { background:#e8f4f7; color:#2e6b7e; }
+  :root[data-theme="dark"] .pill-wh { background:#1a3a42; color:#7ec8d8; }
+  @media(prefers-color-scheme:dark){ :root:not([data-theme="light"]) .pill-wh { background:#1a3a42; color:#7ec8d8; } }
+  .crew-day-detail { color:var(--fg2); font-size:10px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .crew-total { padding:6px 14px 8px; font-size:10px; color:var(--fg3); display:flex; gap:12px; }
+  .crew-total b { color:var(--fg); }
+
+  /* Legend */
+  .legend {
+    display:flex; gap:10px; flex-wrap:wrap;
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:var(--radius); padding:8px 12px; margin-bottom:14px;
+  }
+  .legend-item { display:flex; align-items:center; gap:5px; font-size:11px; }
+  .legend-dot { width:9px; height:9px; border-radius:50%; }
+  .dot-rafa{background:var(--rafa);} .dot-becky{background:var(--becky);}
+  .dot-donal{background:var(--donal);} .dot-gsh{background:var(--gsh);}
+  .dot-kd{background:var(--kd);}
+
+  /* ── CALENDAR VIEW ── */
+  #cal-view { display:none; }
+  .cal-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .cal-nav-btn {
+    padding:6px 14px; border-radius:6px; border:1px solid var(--border);
+    background:var(--bg2); color:var(--fg); cursor:pointer; font-size:13px;
+    font-family:inherit; font-weight:500;
+  }
+  .cal-nav-btn:hover { background:var(--bg3); }
+  .cal-month-label { font-size:18px; font-weight:700; }
+  .cal-grid {
+    display:grid; grid-template-columns:repeat(7,1fr);
+    gap:1px; background:var(--border); border:1px solid var(--border);
+    border-radius:var(--radius); overflow:hidden;
+  }
+  .cal-dow {
+    background:var(--bg3); padding:6px 4px; text-align:center;
+    font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--fg3);
+  }
+  .cal-cell {
+    background:var(--bg2); min-height:90px; padding:5px 4px;
+    vertical-align:top; position:relative;
+  }
+  .cal-cell.other-month { background:var(--bg3); }
+  .cal-cell.weekend { background:color-mix(in srgb,var(--bg2) 85%,var(--accent) 15%); }
+  .cal-cell.other-month.weekend { background:color-mix(in srgb,var(--bg3) 85%,var(--accent) 15%); }
+  .cal-cell.today { background:var(--accent-bg); }
+  .cal-day-num {
+    font-size:11px; font-weight:600; color:var(--fg3);
+    margin-bottom:3px; line-height:1;
+  }
+  .cal-cell.today .cal-day-num { color:var(--accent); font-weight:700; }
+  .cal-event {
+    font-size:10px; font-weight:500; padding:2px 5px; border-radius:3px;
+    margin-bottom:2px; line-height:1.3; cursor:pointer;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:100%;
+  }
+  .cal-event.ev-gsh  { background:var(--gsh-bg);  color:var(--gsh); }
+  .cal-event.ev-kd   { background:var(--kd-bg);   color:var(--kd); }
+  .cal-event.ev-gap  { background:var(--gap-bg);  color:var(--gap); }
+  .cal-event.ev-conflict { background:var(--warn-bg); color:var(--warn); }
+  .cal-event.ev-done { background:var(--done-bg); color:var(--done); }
+  .cal-event.ev-warehouse { background:#e8f4f7; color:#2e6b7e; font-style:normal; }
+  :root[data-theme="dark"] .cal-event.ev-warehouse { background:#1a3a42; color:#7ec8d8; }
+  @media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) .cal-event.ev-warehouse { background:#1a3a42; color:#7ec8d8; } }
+
+  /* Week view */
+  .cal-grid.wk .cal-cell { min-height:260px; padding:6px 5px; }
+  .cal-grid.wk .cal-day-num { font-size:12px; margin-bottom:6px; }
+  .cal-grid.wk .cal-event { white-space:normal; overflow:visible; text-overflow:clip; font-size:11px; padding:4px 6px; margin-bottom:4px; line-height:1.3; }
+  .cal-grid.wk .wk-title { font-weight:600; overflow-wrap:anywhere; }
+  .cal-grid.wk .wk-venue { font-size:9px; font-weight:400; opacity:0.8; overflow-wrap:anywhere; }
+  .wk-dow { display:none; }
+  @media (max-width:700px) {
+    .cal-grid.wk { grid-template-columns:1fr; }
+    .cal-grid.wk .cal-dow { display:none; }
+    .cal-grid.wk .cal-cell { min-height:56px; }
+    .cal-grid.wk .cal-event { font-size:12px; }
+    .wk-dow { display:inline; text-transform:uppercase; letter-spacing:0.06em; font-size:10px; }
+  }
+
+  /* Tooltip / popup */
+  .cal-popup {
+    position:fixed; z-index:200;
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:0 4px 20px rgba(0,0,0,0.18);
+    padding:14px 16px; min-width:220px; max-width:300px;
+    pointer-events:none;
+  }
+  .cal-popup.visible { pointer-events:auto; }
+  .cal-popup-title { font-weight:700; font-size:14px; margin-bottom:2px; }
+  .cal-popup-venue { font-size:11px; color:var(--fg2); margin-bottom:8px; }
+  .cal-popup-crew  { display:flex; flex-direction:column; gap:3px; margin-bottom:8px; }
+  .cal-popup-status { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
+  .cal-popup-note { font-size:11px; color:var(--warn); margin-top:4px; }
+  .cal-popup-close { position:absolute; top:8px; right:10px; cursor:pointer; color:var(--fg3); font-size:16px; }
+
+  .empty { text-align:center; padding:48px 16px; color:var(--fg3); }
+  .empty .icon { font-size:36px; margin-bottom:12px; }
+
+  @media (max-width:600px) {
+    .show-card { grid-template-columns:68px 1fr; }
+    .flags { grid-column:1/-1; flex-direction:row; align-items:center; }
+    .summary-row { grid-template-columns:1fr 1fr; }
+    .cal-cell { min-height:60px; padding:3px 2px; }
+    .cal-event { font-size:9px; padding:1px 3px; }
+    .cal-day-num { font-size:10px; }
+  }
+
+  /* ═══════════ APP THEME — mobile-first ═══════════ */
+  :root { --r:18px; --bar-h:58px; --tab-h:66px; --stripe:transparent;
+          --sh2:0 1px 2px rgba(30,24,10,.05), 0 6px 20px rgba(30,24,10,.06); }
+  html { -webkit-tap-highlight-color:transparent; }
+  body { font-size:15px; -webkit-font-smoothing:antialiased;
+         padding-top:0; padding-bottom:calc(var(--tab-h) + 30px + env(safe-area-inset-bottom,0px));
+         padding-left:max(14px,env(safe-area-inset-left,0px)); padding-right:max(14px,env(safe-area-inset-right,0px)); }
+  button, select, input { touch-action:manipulation; }
+  .app-main { max-width:640px; margin:0 auto; }
+
+  /* top bar */
+  .app-bar { position:sticky; top:env(safe-area-inset-top,0px); z-index:100; height:var(--bar-h);
+    margin:0 -14px 4px; padding:0 14px; display:flex; align-items:center; justify-content:space-between;
+    background:color-mix(in srgb,var(--bg) 84%,transparent); -webkit-backdrop-filter:saturate(1.4) blur(14px); backdrop-filter:saturate(1.4) blur(14px); }
+  .app-title { display:flex; flex-direction:column; line-height:1.05; }
+  .app-title b { font-size:22px; font-weight:700; letter-spacing:-.03em; color:var(--accent); }
+  .app-title small { font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--fg3); margin-top:2px; }
+  .app-actions { display:flex; align-items:center; gap:8px; }
+  .icon-btn { width:40px; height:40px; padding:0; border-radius:50%; background:var(--bg2); border:1px solid var(--border); font-size:17px; display:grid; place-items:center; box-shadow:var(--sh2); color:var(--fg2); cursor:pointer; }
+  .pill-btn { height:40px; padding:0 14px; border-radius:999px; border:1px solid var(--border); background:var(--bg2); color:var(--kd); font:600 13px 'Inter',system-ui,sans-serif; cursor:pointer; box-shadow:var(--sh2); }
+
+  /* bottom tab bar */
+  .tabbar { position:fixed; left:0; right:0; bottom:0; z-index:150; display:flex; justify-content:center;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));
+    background:color-mix(in srgb,var(--bg2) 90%,transparent); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border-top:1px solid var(--border); }
+  .tabbar-inner { display:flex; gap:6px; width:100%; max-width:520px; }
+  .tabbar .view-tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px 6px; border-radius:16px;
+    background:transparent; box-shadow:none; color:var(--fg3); font-size:11px; font-weight:600; border:0; cursor:pointer; transition:background .15s,color .15s; }
+  .tabbar .view-tab svg { width:23px; height:23px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .tabbar .view-tab.active { background:var(--accent-bg); color:var(--accent); box-shadow:none; }
+
+  /* stats + legend + filters scroll rows */
+  .summary-row { display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x proximity; margin:6px -14px 12px; padding:2px 14px 8px; scrollbar-width:none; }
+  .summary-row::-webkit-scrollbar, .filters::-webkit-scrollbar, .legend::-webkit-scrollbar { display:none; }
+  .stat-card { flex:0 0 138px; scroll-snap-align:start; border-radius:var(--r); box-shadow:var(--sh2); padding:14px 16px; }
+  .stat-card .label { font-size:10px; }
+  .stat-card .val { font-size:28px; letter-spacing:-.02em; margin-top:4px; }
+  .stat-card .sub { font-size:11px; margin-top:4px; }
+  .legend { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; border:0; background:transparent; padding:0 0 2px; margin:0 -14px 10px; padding-left:14px; padding-right:14px; gap:14px; }
+  .legend-item { white-space:nowrap; font-size:12px; color:var(--fg2); }
+  .filters { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -14px 12px; padding:2px 14px 4px; gap:8px; }
+  #period-bar { flex-wrap:wrap; overflow:visible; margin:0 0 12px; padding:0; }
+  .filter-label { white-space:nowrap; font-size:12px; }
+  .chip { flex:0 0 auto; white-space:nowrap; padding:8px 15px; font-size:13px; border-radius:999px; }
+  .nav-btn { min-height:38px; padding:0 15px; border-radius:999px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+  .nav-btn.btn-primary { box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 35%,transparent); }
+
+  /* show cards */
+  .month-header { font-size:12px; letter-spacing:.08em; color:var(--fg2); padding:16px 2px 9px; }
+  .show-list { gap:10px; }
+  .show-card { border:1px solid var(--border); border-left:1px solid var(--border)!important; border-radius:var(--r); padding:13px 14px 13px 18px;
+    box-shadow:inset 4px 0 0 var(--stripe), var(--sh2); grid-template-columns:58px 1fr auto; gap:8px 12px; align-items:center; overflow:hidden; }
+  .show-card:hover { box-shadow:inset 4px 0 0 var(--stripe), var(--sh2); }
+  .show-card:active { transform:scale(.992); }
+  .show-card.client-gsh { --stripe:var(--gsh-mid); } .show-card.client-kd { --stripe:var(--kd-mid); } .show-card.client-other { --stripe:var(--accent); }
+  .show-card.has-gap { --stripe:var(--gap); } .show-card.has-conflict { --stripe:var(--warn); }
+  .show-date { align-items:center; text-align:center; background:var(--bg3); border-radius:14px; padding:8px 2px; font-family:inherit; gap:1px; }
+  .show-date .dow { font-size:10px; font-weight:700; letter-spacing:.07em; }
+  .show-date > div:last-child { font-size:13px; font-weight:700; color:var(--fg); line-height:1.15; }
+  .show-name { font-size:16px; font-weight:650; letter-spacing:-.01em; }
+  .show-venue { font-size:13px; margin-top:2px; }
+  .client-badge { font-size:10px; padding:3px 8px; border-radius:999px; }
+  .crew-row { gap:6px; margin-top:8px; }
+  .crew-tag { font-size:12px; padding:4px 10px; border-radius:999px; }
+  .crew-role { font-size:9px; }
+  .status-pill { font-size:10px; padding:4px 10px; }
+  .note-line { font-size:12px; }
+  .show-detail { font-size:13px; }
+  .warehouse-card { border-radius:var(--r); border:1px dashed var(--border); border-left:1px dashed var(--border); padding:11px 14px 11px 18px; grid-template-columns:58px 1fr; gap:10px; opacity:.9;
+    box-shadow:inset 4px 0 0 #4a90a4; align-items:center; }
+  .warehouse-card .show-date { background:var(--bg3); }
+  .warehouse-label { font-size:12px; }
+  .empty { padding:56px 16px; }
+  @media (max-width:600px) { .show-card { grid-template-columns:58px 1fr; } .flags { grid-column:1/-1; flex-direction:row; align-items:center; gap:8px; } .dt-grid { grid-template-columns:1fr; } }
+
+  /* calendar: dots + tap a day */
+  .cal-nav { margin:4px 0 14px; }
+  .cal-month-label { font-size:21px; letter-spacing:-.02em; }
+  .cal-nav-btn { width:44px; height:44px; padding:0; border-radius:50%; font-size:24px; line-height:1; display:grid; place-items:center; box-shadow:var(--sh2); }
+  #period-nav .cal-nav-btn { width:auto; height:36px; padding:0 14px!important; font-size:15px!important; border-radius:999px; }
+  .cal-grid { background:transparent; border:0; gap:2px; border-radius:0; overflow:visible; }
+  .cal-dow { background:transparent; font-size:11px; padding:2px 0 4px; }
+  .cal-cell { border-radius:12px; min-height:90px; padding:5px 1px 5px; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; cursor:pointer; box-shadow:var(--sh2); border:1px solid var(--border); }
+  .cal-cell:active { transform:scale(.96); }
+  .cal-cell.weekend { background:color-mix(in srgb,var(--bg2) 93%,var(--accent) 7%); }
+  .cal-cell.other-month { background:transparent; box-shadow:none; border-color:transparent; opacity:.4; }
+  .cal-cell.today { background:var(--accent-bg); border-color:var(--accent); }
+  .cal-day-num { width:26px; height:26px; margin:0; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:600; color:var(--fg2); }
+  .cal-cell.today .cal-day-num { background:var(--accent); color:#fff; }
+  .cal-dots { display:flex; flex-direction:column; gap:2px; width:100%; min-width:0; }
+  .cal-dots .cal-event { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; line-clamp:4; overflow:hidden; white-space:normal; overflow-wrap:anywhere; hyphens:auto;
+    font-size:8.5px; font-weight:600; letter-spacing:-.015em; line-height:1.16; padding:2px 2px 0; border-bottom:2px solid transparent; margin:0; border-radius:5px; max-width:100%; cursor:pointer; }
+  .cal-dots .cal-event.ev-warehouse { font-weight:600; -webkit-line-clamp:1; line-clamp:1; white-space:nowrap; letter-spacing:-.02em; opacity:.9; }
+  .cal-more { font-size:9px; font-weight:600; color:var(--fg3); text-align:center; }
+  @media (min-width:520px) { .cal-dots .cal-event { font-size:11px; padding:3px 5px; } .cal-more { font-size:10px; } }
+
+  /* sheets (add event / day details) */
+  .modal-back { align-items:flex-end; padding:0; background:rgba(15,12,8,.5); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); animation:fadeIn .18s ease; }
+  .modal { max-width:600px; border:0; border-radius:26px 26px 0 0; padding:8px 18px calc(20px + env(safe-area-inset-bottom,0px)); max-height:90vh; box-shadow:0 -10px 40px rgba(0,0,0,.25); animation:slideUp .28s cubic-bezier(.2,.8,.2,1); }
+  .modal::before { content:''; display:block; width:42px; height:5px; border-radius:3px; background:var(--border); margin:6px auto 14px; }
+  .modal-title { font-size:18px; letter-spacing:-.01em; }
+  .modal-x { width:34px; height:34px; border-radius:50%; background:var(--bg3); font-size:20px; display:grid; place-items:center; }
+  .modal-actions .nav-btn { min-width:90px; min-height:44px; }
+  .day-item { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:13px 14px 13px 18px; margin-bottom:10px; box-shadow:inset 4px 0 0 var(--stripe); }
+  .day-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+  @keyframes slideUp { from { transform:translateY(40px); opacity:.4 } to { transform:none; opacity:1 } }
+
+  /* edit tab */
+  .edit-bar { border:0; border-radius:var(--r); box-shadow:var(--sh2); padding:12px 14px; font-size:13px; }
+  .edit-row { border:1px solid var(--border); border-left:1px solid var(--border); border-radius:var(--r); padding:13px 14px 13px 18px; margin-bottom:10px; box-shadow:inset 4px 0 0 var(--stripe-e,transparent), var(--sh2); }
+  .edit-row.has-gap { --stripe-e:var(--gap); border-left-color:var(--border); } .edit-row.has-conflict { --stripe-e:var(--warn); border-left-color:var(--border); }
+  .edit-row.wh-row { --stripe-e:#4a90a4; }
+  .edit-row.flash { outline:2px solid var(--accent); }
+  .edit-input, .edit-field select { min-height:42px; border-radius:12px; font-size:16px; }
+  .edit-field { font-size:10px; }
+  .edit-fields { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+  .edit-title-input { min-width:160px; }
+  .edit-venue-input { max-width:none; flex:1 1 100%; }
+
+  /* crew tab */
+  .crew-grid { grid-template-columns:1fr!important; gap:14px; }
+  .crew-panel { border-radius:var(--r); border:1px solid var(--border); box-shadow:var(--sh2); }
+  .crew-panel-header { padding:13px 16px; font-size:15px; }
+  .crew-day { padding:7px 16px; font-size:13px; }
+  .crew-day-pill { font-size:11px; }
+  .crew-day-detail { font-size:12px; }
+  select.edit-input { appearance:auto; }
+
+  /* compact stats, hide chrome that doesn't help on a tab */
+  .summary-row { margin-bottom:8px; padding-bottom:6px; }
+  .stat-card { flex:0 0 auto; min-width:118px; padding:10px 14px; }
+  .stat-card .val { font-size:24px; margin-top:2px; }
+  .stat-card .sub { font-size:11px; margin-top:2px; white-space:nowrap; }
+  body[data-view="edit"] #stats, body[data-view="edit"] .legend,
+  body[data-view="crew"] #stats, body[data-view="crew"] .legend { display:none; }
+
+  /* add-event sheet: two columns, sticky Save/Cancel */
+  @media (max-width:700px) { .modal-grid { grid-template-columns:1fr 1fr; } }
+  .modal-grid .full { grid-column:1/-1; }
+  .modal-actions { position:sticky; bottom:calc(-20px - env(safe-area-inset-bottom,0px)); background:var(--bg2); padding:12px 0 calc(8px + env(safe-area-inset-bottom,0px)); margin-top:12px; border-top:1px solid var(--border); }
+
+  /* password gate */
+  #lock { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:24px;
+    background:radial-gradient(120% 80% at 50% 0%, var(--accent-bg), var(--bg) 60%); }
+  body.locked #lock { display:flex; }
+  body.locked .app-bar, body.locked .tabbar, body.locked .app-main { display:none !important; }
+  .lock-card { width:100%; max-width:340px; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; }
+  .lock-logo { display:flex; flex-direction:column; line-height:1.05; margin-bottom:6px; }
+  .lock-logo b { font-size:34px; font-weight:700; letter-spacing:-.03em; color:var(--accent); }
+  .lock-logo small { font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--fg3); margin-top:4px; }
+  .lock-ico { width:44px; height:44px; stroke:var(--fg3); fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  #lock-pw { width:100%; text-align:center; font-size:18px; min-height:50px; border-radius:14px; }
+  .lock-err { min-height:18px; font-size:13px; color:var(--gap); font-weight:600; }
+  .lock-remember { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--fg2); cursor:pointer; }
+  .lock-btn { width:100%; min-height:50px; font-size:16px; }
+  .lock-card.shake { animation:shake .35s; }
+  @keyframes shake { 20%,60% { transform:translateX(-8px) } 40%,80% { transform:translateX(8px) } }
+
+  /* ── proportion pass: bigger top bar, calmer body sizes (tab bar unchanged) ── */
+  body { font-size:14px; }
+  .app-bar { --bar-h:70px; height:70px; margin-bottom:6px; }
+  .app-title b { font-size:30px; letter-spacing:-.035em; }
+  .app-title small { font-size:12.5px; letter-spacing:.1em; margin-top:3px; }
+  .icon-btn { width:44px; height:44px; font-size:18px; }
+  .pill-btn { height:44px; padding:0 16px; font-size:14px; }
+  .app-actions { gap:9px; }
+
+  .summary-row { gap:8px; margin:2px -14px 8px; }
+  .stat-card { min-width:100px; padding:8px 12px; border-radius:15px; }
+  .stat-card .label { font-size:9px; }
+  .stat-card .val { font-size:20px; }
+  .stat-card .sub { font-size:10px; }
+  .legend { gap:12px; }
+  .legend-item { font-size:11px; }
+  .filters { gap:7px; margin-bottom:10px; }
+  .filter-label { font-size:11px; }
+  .chip { padding:6px 12px; font-size:12px; }
+  .nav-btn { min-height:34px; padding:0 13px; font-size:12px; }
+
+  .month-header { font-size:11px; padding:12px 2px 7px; }
+  .show-list { gap:8px; }
+  .show-card { border-radius:16px; padding:10px 12px 10px 15px; grid-template-columns:50px 1fr auto; gap:6px 10px; }
+  .show-date { border-radius:12px; padding:6px 2px; }
+  .show-date .dow { font-size:9px; }
+  .show-date > div:last-child { font-size:12px; }
+  .show-name { font-size:14px; }
+  .show-venue { font-size:12px; }
+  .client-badge { font-size:9px; padding:2px 7px; }
+  .crew-row { gap:5px; margin-top:6px; }
+  .crew-tag { font-size:11px; padding:3px 8px; }
+  .crew-role { font-size:8px; }
+  .status-pill { font-size:9px; padding:3px 8px; }
+  .note-line { font-size:11px; }
+  .show-detail { font-size:12px; }
+  .warehouse-card { border-radius:16px; padding:9px 12px 9px 15px; grid-template-columns:50px 1fr; gap:8px; }
+  .warehouse-label { font-size:11px; }
+  @media (max-width:600px) { .show-card { grid-template-columns:50px 1fr; } }
+
+  .cal-month-label { font-size:19px; }
+  .cal-nav-btn { width:40px; height:40px; font-size:22px; }
+  .cal-dow { font-size:10px; }
+  .cal-cell { min-height:82px; }
+  .cal-day-num { width:24px; height:24px; font-size:12px; }
+
+  .edit-bar { font-size:12px; padding:10px 12px; }
+  .edit-row { border-radius:16px; padding:11px 12px 11px 15px; margin-bottom:8px; }
+  .edit-input, .edit-field select { min-height:40px; }
+  .modal-title { font-size:16px; }
+  .day-item { padding:11px 12px 11px 15px; }
+  .crew-panel-header { padding:11px 14px; font-size:14px; }
+  .crew-day { padding:6px 14px; font-size:12px; }
+  .crew-day-pill { font-size:10px; }
+  .crew-day-detail { font-size:11px; }
+</style>
+
+<!-- Password gate -->
+<div id="lock" role="dialog" aria-label="Enter password">
+  <form class="lock-card" onsubmit="return tryUnlock(event)" autocomplete="off">
+    <div class="lock-logo"><b>Acoustik</b><small>Crew Planner</small></div>
+    <svg class="lock-ico" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></svg>
+    <input id="lock-pw" class="edit-input" type="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" spellcheck="false">
+    <div id="lock-err" class="lock-err"></div>
+    <label class="lock-remember"><input type="checkbox" id="lock-keep" checked> Keep me unlocked on this device</label>
+    <button class="nav-btn btn-primary lock-btn" type="submit">Unlock</button>
+  </form>
+</div>
+<script>document.body.classList.add('locked');</script>
+
+<header class="app-bar">
+  <div class="app-title"><b>Acoustik</b><small>Crew Planner</small></div>
+  <div class="app-actions">
+    <button class="pill-btn" onclick="exportRentman()" title="Export confirmed shows for Rentman import">⬇ CSV</button>
+    <button class="theme-btn icon-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+    <button class="icon-btn" onclick="lockApp()" title="Lock" aria-label="Lock"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></svg></button>
+  </div>
+</header>
+<nav class="tabbar" aria-label="Sections"><div class="tabbar-inner">
+  <button class="view-tab active" id="tab-list" onclick="switchView('list')"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>All</span></button>
+  <button class="view-tab" id="tab-cal" onclick="switchView('cal')"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Calendar</span></button>
+  <button class="view-tab" id="tab-crew" onclick="switchView('crew')"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><path d="M16 5.6a3 3 0 010 5.8M18 14.4c1.7.6 2.7 2.1 3 4.6"/></svg><span>Crew</span></button>
+  <button class="view-tab" id="tab-edit" onclick="switchView('edit')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17z"/><path d="M14.5 7.5l3 3"/></svg><span>Edit</span></button>
+</div></nav>
+
+<div class="app-main">
+
+<div class="summary-row" id="stats"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot dot-rafa"></div> Rafa</div>
+  <div class="legend-item"><div class="legend-dot dot-becky"></div> Becky</div>
+  <div class="legend-item"><div class="legend-dot dot-donal"></div> Donal</div>
+  <div class="legend-item"><div class="legend-dot dot-gsh" style="border-radius:3px"></div> Guinness Storehouse</div>
+  <div class="legend-item"><div class="legend-dot dot-kd"  style="border-radius:3px"></div> Candlelight</div>
+  <div class="legend-item"><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--gap);margin-right:1px"></span> Gap</div>
+  <div class="legend-item"><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--warn);margin-right:1px"></span> Conflict</div>
+</div>
+
+<div class="filters">
+  <span class="filter-label">Show:</span>
+  <button class="chip gsh on" id="f-gsh"   onclick="toggleFilter('gsh')">Guinness</button>
+  <button class="chip kd on"  id="f-kd"    onclick="toggleFilter('kd')">Candlelight</button>
+  <button class="chip gaps"   id="f-gaps"  onclick="toggleFilter('gaps')">⚠ Gaps only</button>
+  <span class="filter-label" style="margin-left:6px">Crew:</span>
+  <button class="chip crew-rafa on"  id="f-rafa"  onclick="toggleCrewFilter('rafa')">Rafa</button>
+  <button class="chip crew-becky on" id="f-becky" onclick="toggleCrewFilter('becky')">Becky</button>
+  <button class="chip crew-donal on" id="f-donal" onclick="toggleCrewFilter('donal')">Donal</button>
+</div>
+
+<!-- List view -->
+<div id="list-view">
+  <div class="filters" id="period-bar">
+    <span class="filter-label">Period:</span>
+    <select class="edit-input" id="period-sel" onchange="setPeriod(this.value)" style="font-size:12px;padding:4px 8px">
+      <option value="all">Upcoming</option>
+      <option value="week">By week</option>
+      <option value="month">By month</option>
+    </select>
+    <span id="period-nav" style="display:none;align-items:center;gap:6px">
+      <button class="cal-nav-btn" style="padding:3px 10px;font-size:12px" onclick="periodStep(-1)" title="Previous">←</button>
+      <span id="period-label" style="font-size:12px;font-weight:600;min-width:150px;text-align:center"></span>
+      <button class="cal-nav-btn" style="padding:3px 10px;font-size:12px" onclick="periodStep(1)" title="Next">→</button>
+      <button class="nav-btn" onclick="periodToday()">Today</button>
+    </span>
+  </div>
+  <div id="schedule"></div>
+</div>
+
+<!-- Crew view -->
+<div id="crew-view" style="display:none">
+  <div id="crew-schedule"></div>
+</div>
+
+<!-- Edit view -->
+<div id="edit-view" style="display:none">
+  <div id="edit-schedule"></div>
+</div>
+
+<!-- Calendar view -->
+<div id="cal-view">
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calPrev()" aria-label="Previous month">‹</button>
+    <div style="text-align:center">
+      <div class="cal-month-label" id="cal-label"></div>
+      <button class="nav-btn" style="margin-top:4px" onclick="calToday()">This month</button>
+    </div>
+    <button class="cal-nav-btn" onclick="calNext()" aria-label="Next month">›</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+</div><!-- /max-width wrapper -->
+
+<!-- Popup -->
+<div class="cal-popup" id="cal-popup">
+  <span class="cal-popup-close" onclick="closePopup()">×</span>
+  <div class="cal-popup-title" id="pp-title"></div>
+  <div class="cal-popup-venue" id="pp-venue"></div>
+  <div class="cal-popup-crew"  id="pp-crew"></div>
+  <div class="cal-popup-status" id="pp-status"></div>
+  <div class="cal-popup-note"  id="pp-note"></div>
+</div>
+
+<script>
+
+// ── Password gate ──
+// Note: this is a simple front-door check in the page itself, not strong security.
+const PW_HASH = '59d15ae4d5106193ea3b6818b02521689d096611b0b75ad9267885b73309a43b';
+const AUTH_KEY = 'acoustik-auth-v1';
+async function pwHash(str) {
+  const data = new TextEncoder().encode('acoustik-crew|'+str);
+  if (window.crypto && crypto.subtle) {
+    const b = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  return null;
+}
+function unlockApp() { document.body.classList.remove('locked'); try { render(); } catch(e) {} }
+function lockApp() {
+  try { localStorage.removeItem(AUTH_KEY); } catch(e) {}
+  const pw = document.getElementById('lock-pw'); if (pw) pw.value = '';
+  document.getElementById('lock-err').textContent = '';
+  document.body.classList.add('locked');
+  setTimeout(()=>pw && pw.focus(), 50);
+}
+async function tryUnlock(e) {
+  if (e) e.preventDefault();
+  const pw = document.getElementById('lock-pw');
+  const h = await pwHash(pw.value);
+  if (h === PW_HASH) {
+    if (document.getElementById('lock-keep').checked) { try { localStorage.setItem(AUTH_KEY, PW_HASH); } catch(e) {} }
+    pw.value = ''; document.getElementById('lock-err').textContent = '';
+    unlockApp();
+  } else {
+    document.getElementById('lock-err').textContent = h===null ? 'This browser cannot check passwords (needs a secure page).' : 'Wrong password — try again.';
+    const card = document.querySelector('.lock-card'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    pw.select();
+  }
+  return false;
+}
+(function() {
+  let ok = false;
+  try { ok = localStorage.getItem(AUTH_KEY) === PW_HASH; } catch(e) {}
+  if (ok) document.body.classList.remove('locked');
+  else setTimeout(()=>{ const pw = document.getElementById('lock-pw'); if (pw) pw.focus(); }, 100);
+})();
+
+const TODAY = (() => { const t = new Date(); t.setHours(0,0,0,0); return t; })();
+const DAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS= ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MSHORT= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function d(s){ const [y,m,day]=s.split('-').map(Number); return new Date(y,m-1,day); }
+
+// ── Raw data ─────────────────────────────────────────────────────────────
+const gshRaw = [
+  // October
+  {date:'2026-10-17',event:'Arrol Always On',status:'Booked',crew:{rafa:true,becky:true}},
+  {date:'2026-10-21',event:'Arthurs',status:'TBC',crew:{}},
+  {date:'2026-10-22',event:'Arrol + Gravity',status:'TBC',crew:{rafa:true,becky:true,other:'James (Gravity)'}},
+  {date:'2026-10-23',event:'Gravity 1',status:'Booked',crew:{rafa:true}},
+  {date:'2026-10-24',event:'Arrol Always On',status:'Booked',crew:{rafa:true,other:'Keelan'}},
+  {date:'2026-10-25',event:'Arrol Always On',status:'Booked',crew:{rafa:true,becky:true}},
+  {date:'2026-10-26',event:'Arthurs',status:'Booked',crew:{rafa:true}},
+  {date:'2026-10-31',event:'Arrol Always On',status:'Booked',crew:{rafa:true,other:'Oliver'}},
+  // November (updated from Xmas Activation PDF + Rafa spreadsheet)
+  // Becky = GSH #1 on: Nov 2,5,10,11,16,18,23,25,26,28,29,30 | Dec 3,5,19,20,27
+  // Single-event days = 1 crew (rotating Rafa→Becky→Donal). Multi-event = 2–3 crew.
+  {date:'2026-11-02',event:'Install PA on 3rd floor (Nov–Jan)',status:'Booked',crew:{becky:true,donal:true}},
+  {date:'2026-11-05',event:'Roving FARO (Christmas Activation)',status:'Booked',crew:{rafa:true,donal:true}},
+  {date:'2026-11-10',event:'Xmas Activation (FARO) + Staff Party',status:'Booked',crew:{rafa:true,donal:true}},
+  {date:'2026-11-11',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{becky:true}},
+  {date:'2026-11-13',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true},note:'Becky & Donal on KD (Elvis)'},
+  {date:'2026-11-14',event:'Arrol Always On',status:'Booked',crew:{rafa:true,other:'Keelan'},note:'Becky on KD (ABBA)'},
+  {date:'2026-11-16',event:'Xmas Activation (FARO)',status:'Booked',crew:{becky:true}},
+  {date:'2026-11-18',event:'Sunbeam',client:'other',venue:'TBC',status:'Booked',crew:{becky:true,donal:true}},
+  {date:'2026-11-18',event:'Xmas Activation (Barbershop Quartet) + Gravity 2 / Full Building',status:'Booked',crew:{rafa:true},need:2,note:'2nd crew needed — Becky & Donal on Sunbeam'},
+  {date:'2026-11-19',event:'Xmas Activation (FARO)',status:'Booked',crew:{donal:true}},
+  {date:'2026-11-21',event:'Arrol Always On',status:'Booked',crew:{rafa:true},note:'Becky on KD (Xmas Carols)'},
+  {date:'2026-11-23',event:'Xmas Activation (FARO)',status:'Booked',crew:{becky:true}},
+  {date:'2026-11-25',event:'St Patricks Cathedral',client:'other',venue:'St Patricks Cathedral',status:'Booked',crew:{becky:true,donal:true}},
+  {date:'2026-11-25',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{rafa:true},note:'Donal on St Patricks Cathedral'},
+  {date:'2026-11-26',event:'Xmas Activation (FARO) + Arthurs',status:'Booked',crew:{rafa:true,donal:true}},
+  {date:'2026-11-28',event:'Arrol Always On',status:'Booked',crew:{becky:true}},
+  {date:'2026-11-29',event:'Arthurs',status:'Booked',crew:{becky:true}},
+  {date:'2026-11-30',event:'Xmas Activation (FARO)',status:'Booked',crew:{donal:true}},
+  // December
+  {date:'2026-12-02',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{rafa:true},note:'Becky on KD (Xmas Carols)'},
+  {date:'2026-12-03',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true},note:'Becky on KD (Xmas)'},
+  {date:'2026-12-05',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{donal:true}},
+  {date:'2026-12-06',event:'Arthurs',status:'Booked',crew:{rafa:true}},
+  {date:'2026-12-07',event:'Xmas Activation (FARO)',status:'Booked',crew:{becky:true}},
+  {date:'2026-12-09',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{donal:true}},
+  {date:'2026-12-10',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true}},
+  {date:'2026-12-12',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{becky:true}},
+  {date:'2026-12-13',event:'Arthurs',status:'Booked',crew:{donal:true}},
+  {date:'2026-12-14',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true},note:'Becky on KD (Xmas Carols)'},
+  {date:'2026-12-16',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{rafa:true},note:'Becky & Donal on KD (ABBA Christmas)'},
+  {date:'2026-12-17',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true}},
+  {date:'2026-12-19',event:'Xmas Activation (Barbershop Quartet) + Build Arrol for Twixmas',status:'Booked',crew:{rafa:true,becky:true,donal:true}},
+  {date:'2026-12-20',event:'Twixmas Rehearsal',status:'Booked',crew:{rafa:true,becky:true,donal:true}},
+  {date:'2026-12-21',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true},note:'Becky & Donal on KD (Xmas)'},
+  {date:'2026-12-23',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{rafa:true}},
+  {date:'2026-12-27',event:'Twixmas',status:'Booked',crew:{rafa:true,becky:true,donal:true}},
+  {date:'2026-12-28',event:'Xmas Activation (FARO) + Twixmas',status:'Booked',crew:{rafa:true,donal:true},note:'Warehouse closed — Xmas shutdown'},
+  {date:'2026-12-29',event:'Xmas Activation (FARO) + Twixmas',status:'Booked',crew:{becky:true,donal:true},note:'Warehouse closed — Xmas shutdown'},
+  {date:'2026-12-30',event:'Xmas Activation (FARO) + Twixmas',status:'Booked',crew:{rafa:true,donal:true},note:'Warehouse closed — Xmas shutdown'},
+  {date:'2026-12-31',event:'Xmas Activation (FARO) + Twixmas',status:'Booked',crew:{becky:true,donal:true},note:'Warehouse closed — Xmas shutdown'},
+];
+
+const kdRaw = [
+  // Oct 2026 — existing confirmed
+  {date:'2026-10-09',show:'Tina Turner',venue:'St. Pats',status:'Done',crew:{foh:'Michael Manning',mons:'Becky',patch:'James Ferry'}},
+  {date:'2026-10-10',show:'Tina Turner',venue:'St. Pats',status:'Done',crew:{foh:'Michael Manning',mons:'Becky',patch:'James Ferry'}},
+  {date:'2026-10-16',show:'Coldplay',venue:'The Helix',status:'Booked',crew:{foh:'Michael Manning',mons:'Becky',patch:'TBC'}},
+  {date:'2026-10-23',show:'Adele',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2026-10-24',show:'Whitney Houston',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  // Nov 2026
+  // Crew per Acoustik Candlelight 2026 sheet
+  {date:'2026-11-13',show:'Elvis',venue:'St. Pats',status:'Booked',crew:{foh:'Nick',mons:'Becky',patch:'TBC'}},
+  {date:'2026-11-14',show:'ABBA',venue:'St. Pats',status:'Booked',crew:{foh:'Nick',mons:'Becky',patch:'TBC'}},
+  {date:'2026-11-19',show:'Fleetwood Mac',venue:'Ulster Hall Belfast',status:'Booked',crew:{foh:'Nick',mons:'Adam',patch:'Becky'}},
+  {date:'2026-11-20',show:'U2',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  {date:'2026-11-21',show:'Bruce Springsteen',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  {date:'2026-11-27',show:'2× Coldplay',venue:'St Canices Kilkenny',status:'Booked',crew:{foh:'Nick',mons:'Becky',patch:'TBC'}},
+  // Dec 2026
+  {date:'2026-12-02',show:'Christmas',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  {date:'2026-12-03',show:'Christmas',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  {date:'2026-12-14',show:'Bublé Christmas',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  {date:'2026-12-15',show:'Christmas Belfast',venue:'Ulster Hall Belfast',status:'Booked',crew:{foh:'Nick',mons:'Adam',patch:'Becky'}},
+  {date:'2026-12-16',show:'ABBA Christmas',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  {date:'2026-12-21',show:'Christmas',venue:'St. Pats',status:'Booked',crew:{foh:'Ian Dowdall',mons:'Nick',patch:'Becky'}},
+  // Jan 2027
+  {date:'2027-01-08',show:'Elvis',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-01-09',show:'Whitney Houston',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-01-15',show:'Pink Floyd',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-01-16',show:'Ed Sheeran',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  // Feb 2027
+  {date:'2027-02-05',show:'Luther Vandross',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-02-06',show:'Amy Winehouse',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-02-19',show:'David Bowie',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-02-20',show:'David Bowie',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  // Mar 2027
+  {date:'2027-03-05',show:'Westlife',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-03-06',show:'Robbie Williams',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-03-12',show:'Pink Floyd',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-03-13',show:'Coldplay',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-03-20',show:'Robbie Williams',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  // Apr 2027
+  {date:'2027-04-02',show:'Taylor Swift',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-04-03',show:'Bowie',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-04-09',show:'TBC',venue:'TBC',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-04-10',show:'TBC',venue:'TBC',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-04-16',show:'Fleetwood Mac',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-04-17',show:'Fleetwood Mac',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-04-30',show:'Motown',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  // May 2027
+  {date:'2027-05-01',show:'Motown',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-05-06',show:'Fleetwood Mac',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-05-07',show:'U2',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-05-08',show:'Fleetwood Mac',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-05-14',show:'U2',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-05-15',show:'Country',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-05-27',show:'Queen',venue:'Millennium Forum Londonderry',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-05-28',show:'ABBA',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-05-29',show:'Coldplay',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  // Jun 2027
+  {date:'2027-06-10',show:'ELO',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-06-11',show:'Eagles',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-06-25',show:'Frankie Valli',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-06-26',show:'Voices of Valjean',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-07-02',show:'Queen',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-07-03',show:'Country',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-07-01',show:'Queen',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  // Jul–Aug 2027
+  {date:'2027-07-24',show:'Robbie Williams',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-07-27',show:'Eagles',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-07-28',show:'Bruce Springsteen',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-08-05',show:'Coldplay',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-08-27',show:'Eagles',venue:'Millennium Forum Londonderry',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-08-28',show:'Meat Loaf',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  // Sep 2027
+  {date:'2027-09-09',show:'Eagles',venue:'Millennium Forum Londonderry',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-09-10',show:'Queen',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-09-11',show:'Queen',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-09-24',show:'Bruce Springsteen',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-09-25',show:'Bruce Springsteen',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  // Oct 2027
+  {date:'2027-10-01',show:'ABBA',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-10-02',show:'Céline Dion',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-10-08',show:'Céline Dion',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-10-09',show:'Coldplay',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-10-22',show:'Adele',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-10-23',show:'Whitney Houston',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  // Nov 2027
+  {date:'2027-11-05',show:'Beatles',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-11-06',show:'Phil Collins & Genesis',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-11-12',show:'Eagles',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-11-13',show:'Meat Loaf',venue:'St Canices Kilkenny',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  {date:'2027-11-19',show:'Elvis',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-11-20',show:'Tina Turner',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-11-26',show:'Elvis',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-11-27',show:'Céline Dion',venue:'City Hall Cork',status:'Planned',crew:{foh:'TBC',mons:'Becky',patch:'TBC'}},
+  // Dec 2027
+  {date:'2027-12-01',show:'ABBA Christmas',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-12-06',show:'Bublé Christmas',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-12-13',show:'Motown Christmas',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+  {date:'2027-12-20',show:'Christmas',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Becky',patch:'TBC'}},
+  {date:'2027-12-22',show:'Christmas',venue:'St. Pats',status:'Planned',crew:{foh:'Ian Dowdall',mons:'Rafa',patch:'TBC'}},
+];
+
+// ── Candlelight Mons rule ────────────────────────────────────────────────
+// Two consecutive days at the same venue = one block, same person on Mons both days.
+// Blocks alternate Becky / Rafa per venue (St. Pats anchored: 5–6 Feb 2027 = Becky,
+// 19–20 Feb = Rafa, and so on). Only 'Planned' shows are touched; booked ones stay as confirmed.
+(function assignMonsBlocks(){
+  const byVenue = {};
+  for (const s of kdRaw) {
+    if (s.status!=='Planned' || !s.venue || s.venue==='TBC') continue;
+    (byVenue[s.venue] = byVenue[s.venue] || []).push(s);
+  }
+  for (const [venue, list] of Object.entries(byVenue)) {
+    list.sort((a,b)=>a.date<b.date?-1:1);
+    const blocks = [];
+    for (let i=0;i<list.length;i++) {
+      const nxt = list[i+1];
+      if (nxt && (d(nxt.date)-d(list[i].date))===86400000) { blocks.push([list[i],nxt]); i++; }
+    }
+    let offset = 0;
+    if (venue==='St. Pats') {
+      const kb = blocks.findIndex(b=>b[0].date==='2027-02-05');
+      if (kb>=0) offset = kb%2;
+    }
+    blocks.forEach((b,k)=>{
+      const who = (k+offset)%2===0 ? 'Becky' : 'Rafa';
+      b.forEach(s=>{ s.crew.mons = who; });
+    });
+  }
+})();
+
+function isRafa(n)  { return n && /rafa|rafael|ruis/i.test(n); }
+function isBecky(n) { return n && /becky|corrigan/i.test(n); }
+function isDonal(n) { return n && /donal/i.test(n); }
+
+// ── Manual crew edits (saved per device) ──
+let OVR = {};
+try { OVR = JSON.parse(localStorage.getItem('acoustik-crew-overrides-v1')||'{}') || {}; } catch(e) { OVR = {}; }
+function saveOVR() { try { localStorage.setItem('acoustik-crew-overrides-v1', JSON.stringify(OVR)); } catch(e) {} }
+
+// Shared store: every viewer's edits are saved to the artifact database and appear live for everyone
+// ── Shared storage when hosted outside Claude (e.g. GitHub Pages) ──
+// Paste your Firebase web-app config here (see setup steps). Leave as null inside Claude, which has its own shared storage.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAfaPAZiQx3e8gbar76qAtw2RDHbo9udKc",
+  authDomain: "acoustikcrew-efcb4.firebaseapp.com",
+  databaseURL: "https://acoustikcrew-efcb4-default-rtdb.firebaseio.com",
+  projectId: "acoustikcrew-efcb4",
+  storageBucket: "acoustikcrew-efcb4.firebasestorage.app",
+  messagingSenderId: "137492313813",
+  appId: "1:137492313813:web:e755b7b82739100ad4145c"
+};
+/* Example:
+const FIREBASE_CONFIG = { apiKey:"...", authDomain:"...", projectId:"...", storageBucket:"...", messagingSenderId:"...", appId:"..." };
+*/
+function loadScript(src) { return new Promise((res, rej) => { const t = document.createElement('script'); t.src = src; t.onload = res; t.onerror = () => rej(new Error('load '+src)); document.head.appendChild(t); }); }
+async function initFirebase() {
+  if (!window.firebase) {
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');
+  }
+  if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  return firebase.firestore();
+}
+let syncOn = false;
+let DB = null, canWrite = true, pendingRender = false;
+function encK(k) { return encodeURIComponent(k).replace(/'/g,'%27'); }
+// ── Warehouse day edits (shared with everyone): date -> {crew:[names]} replaces the automatic warehouse crew ──
+let WHOVR = {};
+try { WHOVR = JSON.parse(localStorage.getItem('acoustik-warehouse-v1')||'{}') || {}; } catch(e) { WHOVR = {}; }
+function saveWh() { try { localStorage.setItem('acoustik-warehouse-v1', JSON.stringify(WHOVR)); } catch(e) {} }
+function pushWh(ds) {
+  if (!DB) return;
+  const ref = DB.collection('warehouseEdits').doc(ds);
+  const p = WHOVR[ds] ? ref.set({date:ds, crew:WHOVR[ds].crew}) : ref.delete();
+  Promise.resolve(p).catch(()=>{});
+}
+// ── Added events (shared with everyone) ──
+let CUSTOM = [];
+try { CUSTOM = JSON.parse(localStorage.getItem('acoustik-crew-custom-v1')||'[]') || []; } catch(e) { CUSTOM = []; }
+function saveCustom() { try { localStorage.setItem('acoustik-crew-custom-v1', JSON.stringify(CUSTOM)); } catch(e) {} }
+function cleanTxt(v) { return String(v==null?'':v).replace(/[<>"]/g,'').trim().slice(0,120); }
+function refreshShared() {
+  allShows = buildShows();
+  const ae = document.activeElement;
+  if (ae && ae.closest && ae.closest('#edit-schedule')) pendingRender = true; else render();
+}
+document.addEventListener('focusout', () => { setTimeout(() => { const ae = document.activeElement; if (pendingRender && !(ae && ae.closest && ae.closest('#edit-schedule'))) { pendingRender = false; render(); } }, 150); });
+function docId(key) { return key.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,150); }
+function pushOvr(key) {
+  if (!DB) return;
+  const ref = DB.collection('crewEdits').doc(docId(key));
+  const p = OVR[key] ? ref.set({key, ov:OVR[key]}) : ref.delete();
+  Promise.resolve(p).catch(()=>{});
+}
+(async () => {
+  try {
+    if (window.claude && window.claude.use) {
+      const u = await window.claude.use('user');
+      if (u && u.can && u.can('data.write') === false) canWrite = false;
+      DB = await window.claude.use('db');
+    }
+    if (!DB && FIREBASE_CONFIG) DB = await initFirebase();
+    if (!DB) return;
+    syncOn = true; try { if (viewMode==='edit') render(); } catch(e) {}
+    DB.collection('crewEdits').onSnapshot(snap => {
+      const o = {};
+      snap.docs.forEach(d => { const v = d.data(); if (v && v.key && v.ov) o[v.key] = v.ov; });
+      OVR = o; saveOVR(); refreshShared();
+    }, () => {});
+    DB.collection('warehouseEdits').onSnapshot(snap => {
+      const o = {};
+      snap.docs.forEach(x => { const v = x.data(); if (v && v.date && Array.isArray(v.crew)) o[v.date] = {crew:v.crew}; });
+      WHOVR = o; saveWh(); refreshShared();
+    }, () => {});
+    DB.collection('customEvents').onSnapshot(snap => {
+      const list = [];
+      snap.docs.forEach(d => { const v = d.data(); if (v && v.id && v.date && v.title) list.push(v); });
+      CUSTOM = list; saveCustom(); refreshShared();
+    }, () => {});
+  } catch(e) {}
+})();
+
+function tempNames(ov) {
+  return String((ov && ov.temp) || '').split(',').map(x=>cleanTxt(x)).filter(Boolean).slice(0,6);
+}
+function buildShows() {
+  const shows = [];
+  const customRows = CUSTOM.filter(x => x && x.id && /^\d{4}-\d{2}-\d{2}$/.test(x.date||'') && x.title);
+  const gshAll = gshRaw.concat(customRows.filter(x=>x.client!=='kd').map(x=>({
+    date:x.date, event:cleanTxt(x.title), venue:cleanTxt(x.venue)||(x.client==='gsh'?'Guinness Storehouse':'TBC'),
+    client:x.client==='other'?'other':'gsh', status:x.status||'Booked', crew:{...(x.crew||{})}, customId:x.id
+  })));
+  const kdAll = kdRaw.concat(customRows.filter(x=>x.client==='kd').map(x=>({
+    date:x.date, show:cleanTxt(x.title), venue:cleanTxt(x.venue)||'TBC',
+    status:x.status||'Booked', crew:{...(x.crew||{})}, customId:x.id
+  })));
+  for (const s of gshAll) {
+    const c = {...s.crew};
+    // Xmas/Christmas Activation on its own needs only ONE crew member; the rest go to warehouse
+    let whNote = '';
+    if (/(xmas|christmas) activation/i.test(s.event) && !/\+/.test(s.event)) {
+      const names = ['rafa','becky','donal'];
+      const keep = names.find(k=>c[k]);
+      const dropped = names.filter(k=>c[k] && k!==keep);
+      if (dropped.length) {
+        dropped.forEach(k=>delete c[k]);
+        whNote = '1 crew needed — ' + dropped.map(k=>k[0].toUpperCase()+k.slice(1)).join(', ') + ' → Warehouse';
+      }
+    }
+    // Manual edit wins over automatic rules
+    const ov = OVR[s.date+'|'+s.event];
+    const eDate = (ov && ov.date) || s.date;
+    const eTitle = (ov && ov.title) || s.event;
+    let typed = [];
+    if (ov && ov.slots) {
+      delete c.other; // the slot boxes now hold everyone, including names that used to show as 'Also'
+      c.rafa = c.becky = c.donal = false;
+      ov.slots.forEach(n => {
+        const low = String(n).toLowerCase();
+        if (low==='rafa'||low==='becky'||low==='donal') c[low] = true; else if (cleanTxt(n)) typed.push(cleanTxt(n));
+      });
+      whNote = '';
+    } else if (c.other) {
+      typed = c.other.split(', ').filter(Boolean);
+    }
+    const crew = [];
+    if (c.rafa)  crew.push({name:'Rafa',  role:'Lead Eng',type:'rafa'});
+    if (c.becky) crew.push({name:'Becky', role:'2nd Eng', type:'becky'});
+    if (c.donal) crew.push({name:'Donal', role:'2nd Eng', type:'donal'});
+    if (c.other) for (const n of c.other.split(', ')) crew.push({name:n,role:'',type:'other'});
+    if (ov && ov.slots) for (const n of typed) crew.push({name:n,role:'',type:'other'});
+    for (const n of tempNames(ov)) crew.push({name:n,role:'Temp',type:'other'});
+    shows.push({
+      dt:d(eDate), dateStr:eDate, client:s.client||'gsh',
+      title:eTitle, venue:(ov && ov.venue) || s.venue || 'Guinness Storehouse', status:s.status,
+      key:s.date+'|'+s.event, custom:s.customId||null, typed, c,
+      crew, note:[s.note,whNote].filter(Boolean).join(' · '),
+      hasGap: crew.length===0 || (s.need && crew.length<s.need),
+      hasBecky:!!c.becky, hasRafa:!!c.rafa, hasDonal:!!c.donal,
+      hasConflict:false
+    });
+  }
+  for (const s of kdAll) {
+    const kov = OVR[s.date+'|'+s.show] || {};
+    const c = {...s.crew, ...kov};
+    const crew = [];
+    if (c.foh && c.foh!=='TBC') crew.push({name:c.foh, role:'FOH', type:isRafa(c.foh)?'rafa':isBecky(c.foh)?'becky':isDonal(c.foh)?'donal':'other'});
+    if (c.mons && c.mons!=='TBC') crew.push({name:c.mons, role:'Mons', type:isBecky(c.mons)?'becky':isRafa(c.mons)?'rafa':isDonal(c.mons)?'donal':'other'});
+    if (c.donal) crew.push({name:'Donal',role:'Patch',type:'donal'});
+    else if (c.patch && c.patch!=='TBC' && c.patch!=='') crew.push({name:c.patch, role:'Patch', type:isBecky(c.patch)?'becky':isDonal(c.patch)?'donal':isRafa(c.patch)?'rafa':'other'});
+    const locals = c.local ? (Array.isArray(c.local) ? c.local : [c.local]) : [];
+    for (const n of locals) crew.push({name:n,role:'',type:isDonal(n)?'donal':isBecky(n)?'becky':isRafa(n)?'rafa':'other'});
+    for (const n of tempNames(kov)) crew.push({name:n,role:'Temp',type:'other'});
+    const extras = (Array.isArray(c.extra)?c.extra:[]).map(cleanTxt).filter(Boolean).slice(0,2);
+    for (const n of extras) crew.push({name:n,role:'Crew',type:isDonal(n)?'donal':isBecky(n)?'becky':isRafa(n)?'rafa':'other'});
+    const beckyR  = isBecky(c.foh)||isBecky(c.mons)||isBecky(c.patch)||!!c.becky||extras.some(isBecky);
+    const missPatch = !c.patch||c.patch==='TBC';
+    const missMons  = !c.mons ||c.mons ==='TBC';
+    shows.push({
+      dt:d(kov.date||s.date), dateStr:kov.date||s.date, client:'kd',
+      title:kov.title||s.show, venue:kov.venue||s.venue, status:s.status,
+      key:s.date+'|'+s.show, custom:s.customId||null, extras, c,
+      crew, note:s.note||'',
+      hasGap: missPatch||missMons,
+      hasBecky: beckyR, hasRafa:isRafa(c.foh)||isRafa(c.mons)||isRafa(c.patch)||extras.some(isRafa),
+      hasDonal:!!c.donal||isDonal(c.foh)||isDonal(c.mons)||isDonal(c.patch)||locals.some(isDonal)||extras.some(isDonal),
+      hasConflict:false
+    });
+  }
+  shows.sort((a,b)=>a.dt-b.dt);
+  // Conflict detection
+  const byDate = {};
+  for (const s of shows) { if (!byDate[s.dateStr]) byDate[s.dateStr]=[]; byDate[s.dateStr].push(s); }
+  for (const dayShows of Object.values(byDate)) {
+    if (dayShows.length<2) continue;
+    for (const s of dayShows) {
+      const others = dayShows.filter(x=>x!==s);
+      const conflicts = [];
+      for (const o of others) {
+        const who=[];
+        if (s.hasBecky&&o.hasBecky) who.push('Becky');
+        if (s.hasRafa &&o.hasRafa)  who.push('Rafa');
+        if (s.hasDonal&&o.hasDonal) who.push('Donal');
+        if (who.length) conflicts.push({who,show:o.title,client:o.client});
+      }
+      if (conflicts.length) { s.conflictInfo=conflicts; s.hasConflict=true; }
+    }
+  }
+  return shows;
+}
+
+let allShows = buildShows();
+
+// ── Warehouse duty — 5-day week model ────────────────────────────────────
+// All three work Mon–Fri (5 days). Show days count as work days.
+// Remaining weekdays (up to 5 total) are warehouse days.
+//
+// Per ISO week: count each person's show days Mon–Fri, then fill remaining
+// Mon–Fri slots (in order) as warehouse days, stopping at 5 total.
+function buildWarehouseEntries(shows) {
+  const CREW = ['Rafa','Becky','Donal'];
+  const start = new Date(2026, 10, 1);  // Nov 1
+  const end   = new Date(2026, 11, 23); // Dec 23 (warehouse closes 24 Dec)
+
+  // Index ALL show days per person (including weekends — they count toward the 5-day week)
+  const showDays = {Rafa:new Set(), Becky:new Set(), Donal:new Set()};
+  // Also track weekend show counts per ISO week per person
+  const weekendShowCount = {Rafa:{}, Becky:{}, Donal:{}};
+  function isoWk(dt) {
+    const tmp = new Date(dt); tmp.setDate(tmp.getDate()+4-((tmp.getDay()||7)));
+    return tmp.getFullYear()*100 + Math.ceil((((tmp-new Date(tmp.getFullYear(),0,1))/86400000)+1)/7);
+  }
+  for (const s of shows) {
+    if (s.status==='Done') continue;
+    const dow = s.dt.getDay();
+    const wk = isoWk(s.dt);
+    if (s.hasRafa)  { showDays.Rafa.add(s.dateStr);  if (dow===0||dow===6) weekendShowCount.Rafa[wk]  = (weekendShowCount.Rafa[wk]||0)+1; }
+    if (s.hasBecky) { showDays.Becky.add(s.dateStr); if (dow===0||dow===6) weekendShowCount.Becky[wk] = (weekendShowCount.Becky[wk]||0)+1; }
+    if (s.hasDonal) { showDays.Donal.add(s.dateStr); if (dow===0||dow===6) weekendShowCount.Donal[wk] = (weekendShowCount.Donal[wk]||0)+1; }
+  }
+
+  // Gather all Mon–Fri dates in range, grouped by ISO week
+  const weekMap = {}; // weekKey -> [dateStr, ...]
+  for (let dt=new Date(start); dt<=end; dt.setDate(dt.getDate()+1)) {
+    const dow = dt.getDay();
+    if (dow===0||dow===6) continue; // Mon–Fri slots only (weekend shows reduce available slots)
+    const ds = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    const wk = isoWk(dt);
+    if (!weekMap[wk]) weekMap[wk]=[];
+    weekMap[wk].push(ds);
+  }
+
+  // For each week, assign warehouse days per person
+  // Weekend shows consume weekday slots (5-day week total inc weekends)
+  const whByDate = {}; // dateStr -> [names]
+  for (const [wk, days] of Object.entries(weekMap)) {
+    for (const person of CREW) {
+      const weekdayShows = days.filter(ds=>showDays[person].has(ds)).length;
+      const weekendShows = weekendShowCount[person][wk] || 0;
+      const totalShows = weekdayShows + weekendShows;
+      const remaining = Math.max(0, 5 - totalShows);
+      if (remaining <= 0) continue;
+      // Fill warehouse on free weekdays only
+      const freeDays = days.filter(ds=>!showDays[person].has(ds)).slice(0, remaining);
+      for (const ds of freeDays) {
+        if (!whByDate[ds]) whByDate[ds]=[];
+        whByDate[ds].push(person);
+      }
+    }
+  }
+
+  // Convert to array of entries
+  for (const [ds,o] of Object.entries(WHOVR)) { if (o && Array.isArray(o.crew)) whByDate[ds] = o.crew.slice(0,5); }
+  return Object.entries(whByDate).filter(([ds,crew])=>crew.length)
+    .map(([ds,crew])=>({dt:d(ds), dateStr:ds, isWarehouse:true, crew}))
+    .sort((a,b)=>a.dt-b.dt);
+}
+
+let activeFilters = {gsh:true,kd:true,gaps:false,rafa:true,becky:true,donal:true};
+let scopeMode = 'upcoming';
+let viewMode  = 'list';
+let calYear = TODAY.getFullYear(), calMonth = TODAY.getMonth();
+let mYear = TODAY.getFullYear(), mMonth = TODAY.getMonth();
+
+async function exportRentman() {
+  const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const shows = buildShows().filter(s => s.status === 'Booked' && s.client !== 'other');
+  const rows = [['Color','Number','Name','Project status','Client (Client)','Location (Location)','Start planning period','End of planning period','Project type (Project type)']];
+  for (const s of shows) {
+    const color = s.client === 'gsh' ? '1a5c3a' : 'fff403';
+    const mo = MONTHS_S[s.dt.getMonth()];
+    const dy = s.dt.getDate();
+    const yr = s.dt.getFullYear();
+    const name = s.client === 'gsh'
+      ? `${s.title} — GSH ${dy} ${mo} ${yr}`
+      : `${s.title} — ${s.venue} ${dy} ${mo} ${yr}`;
+    const start = `${s.dateStr} 13:00:00`;
+    const end   = `${s.dateStr} 23:00:00`;
+    const client = s.client === 'gsh' ? 'Guinness Storehouse' : 'Kinda Dusty';
+    rows.push([color, '', name, 'Confirmed', client, s.venue, start, end, 'Production']);
+  }
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  try {
+    const downloads = (window.claude && window.claude.use) ? await window.claude.use('downloads') : null;
+    if (!downloads) {
+      const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'acoustik_rentman_export.csv';
+      document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      return;
+    }
+    if (downloads) {
+      await downloads.save({
+        filename: 'acoustik_rentman_export.csv',
+        data: new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'})
+      });
+    } else {
+      alert('Download not available in this viewer.');
+    }
+  } catch(e) {
+    console.error('Export failed:', e);
+  }
+}
+
+function switchView(v) {
+  viewMode=v;
+  document.body.dataset.view = v;
+  document.getElementById('tab-list').classList.toggle('active',v==='list');
+  document.getElementById('tab-cal').classList.toggle('active',v==='cal');
+  document.getElementById('tab-crew').classList.toggle('active',v==='crew');
+  document.getElementById('tab-edit').classList.toggle('active',v==='edit');
+  document.getElementById('list-view').style.display  = v==='list' ?'block':'none';
+  document.getElementById('cal-view').style.display   = v==='cal'  ?'block':'none';
+  document.getElementById('crew-view').style.display  = v==='crew' ?'block':'none';
+  document.getElementById('edit-view').style.display  = v==='edit' ?'block':'none';
+  render();
+}
+function toggleFilter(f) {
+  if (f==='gaps') activeFilters.gaps=!activeFilters.gaps;
+  else activeFilters[f]=!activeFilters[f];
+  document.getElementById('f-'+f).classList.toggle('on',activeFilters[f]);
+  render();
+}
+const CREW_KEYS = ['rafa','becky','donal'];
+function selectedPeople() { return CREW_KEYS.filter(k=>activeFilters[k]); }
+function personMode() { const n = selectedPeople().length; return n>=1 && n<3; }
+function toggleCrewFilter(w) {
+  const allOn = CREW_KEYS.every(k=>activeFilters[k]);
+  if (allOn) CREW_KEYS.forEach(k=>activeFilters[k] = (k===w)); // tap a person: show just them
+  else activeFilters[w] = !activeFilters[w];
+  if (!CREW_KEYS.some(k=>activeFilters[k])) CREW_KEYS.forEach(k=>activeFilters[k]=true); // nobody selected = everyone
+  CREW_KEYS.forEach(k=>document.getElementById('f-'+k).classList.toggle('on',activeFilters[k]));
+  render();
+}
+
+function filteredShows(ignoreScope) {
+  let shows = allShows;
+  if (scopeMode==='upcoming' && !ignoreScope) shows=shows.filter(s=>s.dt>=TODAY&&s.status!=='Done');
+  return shows.filter(s=>{
+    if (s.client==='gsh'&&!activeFilters.gsh) return false;
+    if (s.client==='kd' &&!activeFilters.kd)  return false;
+    if (activeFilters.gaps&&!s.hasGap&&!s.hasConflict) return false;
+    const crewMatch=(activeFilters.rafa&&s.hasRafa)||(activeFilters.becky&&s.hasBecky)||(activeFilters.donal&&s.hasDonal)||(!personMode()&&!s.hasRafa&&!s.hasBecky&&!s.hasDonal);
+    return crewMatch;
+  });
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────
+function renderStats(shows) {
+  const gc=shows.filter(s=>s.client==='gsh').length;
+  const kc=shows.filter(s=>s.client==='kd').length;
+  const gap=shows.filter(s=>s.hasGap&&!s.hasConflict).length;
+  const conf=shows.filter(s=>s.hasConflict).length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat-card stat-gsh"><div class="label">GSH Shows</div><div class="val">${gc}</div><div class="sub">Guinness Storehouse</div></div>
+    <div class="stat-card stat-kd"><div class="label">Candlelight</div><div class="val">${kc}</div><div class="sub">Kinda Dusty shows</div></div>
+    <div class="stat-card stat-gap"><div class="label">Crew Gaps</div><div class="val">${gap}</div><div class="sub">Roles unassigned</div></div>
+    <div class="stat-card stat-conflict"><div class="label">Conflicts</div><div class="val">${conf}</div><div class="sub">Same-day clashes</div></div>`;
+}
+
+// ── List view ─────────────────────────────────────────────────────────────
+function statusPill(s) {
+  if (s.hasConflict) return `<span class="status-pill pill-conflict">⚠ Conflict</span>`;
+  if (s.hasGap)      return `<span class="status-pill pill-gap">⚠ Gap</span>`;
+  const cls={Booked:'pill-booked',TBC:'pill-tbc',Planned:'pill-planned',Done:'pill-done'}[s.status]||'pill-tbc';
+  return `<span class="status-pill ${cls}">${s.status}</span>`;
+}
+function crewTag(c) {
+  const cls={rafa:'tag-rafa',becky:'tag-becky',donal:'tag-donal',other:'tag-other'}[c.type];
+  return `<span class="crew-tag ${cls}">${c.role?`<span class="crew-role">${c.role}</span>`:''} ${c.name}</span>`;
+}
+function renderList(shows, range) {
+  const emptyMsg = `<div class="empty"><div class="icon">📋</div><p>${range ? 'No shows or warehouse days in this period.' : 'No shows match your filters.'}</p></div>`;
+  if (!shows.length && !range) return emptyMsg;
+
+  // Build warehouse entries for the same date range as shows
+  const whEntries = buildWarehouseEntries(allShows);
+  // Index warehouse by dateStr for quick lookup
+  const whByDate = {};
+  for (const w of whEntries) whByDate[w.dateStr] = w;
+
+  const groups={};
+  for (const s of shows) {
+    const k=s.dt.getFullYear()+'-'+String(s.dt.getMonth()+1).padStart(2,'0');
+    if (!groups[k]) groups[k]={label:MONTHS[s.dt.getMonth()]+' '+s.dt.getFullYear(),shows:[]};
+    groups[k].shows.push(s);
+  }
+  // Every weekday with no event at all (Guinness, Candlelight or Other) is listed with who is in the warehouse.
+  if (personMode() && !activeFilters.gaps) {
+    // Selected person(s): also list the weekdays they are in the warehouse (their other working days)
+    const WH_START = new Date(2026, 10, 1), WH_END = new Date(2026, 11, 24);
+    const mine = selectedPeople().map(k=>k[0].toUpperCase()+k.slice(1));
+    const shownDates = new Set(shows.map(x=>x.dateStr));
+    let from = range ? range[0] : (scopeMode==='upcoming' ? TODAY : WH_START);
+    let to   = range ? range[1] : WH_END;
+    if (from < WH_START) from = WH_START;
+    if (to > WH_END) to = WH_END;
+    for (let dt = new Date(from); dt < to; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
+      if (dt.getDay()===0 || dt.getDay()===6) continue;
+      const ds = isoStr(dt);
+      if (shownDates.has(ds)) continue; // already on a show that day
+      const w = whByDate[ds];
+      const crew = w ? w.crew.filter(n=>mine.includes(n)) : [];
+      if (!crew.length) continue;
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), shows:[]};
+      groups[k].shows.push({dt:new Date(dt), dateStr:ds, isWarehouseOnly:true, crew});
+    }
+  } else if (!activeFilters.gaps) {
+    const WH_START = new Date(2026, 10, 1), WH_END = new Date(2026, 11, 24); // warehouse open 1 Nov – 23 Dec
+    const evDates = new Set(allShows.map(x=>x.dateStr));
+    let from = range ? range[0] : (scopeMode==='upcoming' ? TODAY : WH_START);
+    let to   = range ? range[1] : WH_END;
+    if (from < WH_START) from = WH_START;
+    if (to > WH_END) to = WH_END;
+    for (let dt = new Date(from); dt < to; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
+      const dow = dt.getDay();
+      if (dow===0 || dow===6) continue;
+      const ds = isoStr(dt);
+      if (evDates.has(ds)) continue; // days with events already show their warehouse crew in the event card
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), shows:[]};
+      const w = whByDate[ds];
+      groups[k].shows.push({dt:new Date(dt), dateStr:ds, isWarehouseOnly:true, crew:w?w.crew:[]});
+    }
+  }
+  // Re-sort each group by date
+  for (const g of Object.values(groups)) g.shows.sort((a,b)=>a.dt-b.dt);
+
+  let html='';
+  for (const [gk, g] of Object.entries(groups).sort((x,y)=>x[0]<y[0]?-1:1)) {
+    const cards = g.shows.map(s=>{
+      // Warehouse-only day (no show)
+      if (s.isWarehouseOnly) {
+        const dow=DAYS[s.dt.getDay()];
+        const dl=String(s.dt.getDate()).padStart(2,'0')+' '+MSHORT[s.dt.getMonth()];
+        const tags = s.crew.length ? s.crew.map(name=>`<span class="crew-tag tag-warehouse">🏭 ${name}</span>`).join('') : `<span class="crew-tag" style="background:var(--bg3);color:var(--fg3)">No one in the warehouse</span>`;
+        return `<div class="warehouse-card">
+          <div class="show-date"><div class="dow">${dow}</div><div>${dl}</div></div>
+          <div><span class="warehouse-label">🏭 Warehouse</span>
+            <div class="warehouse-crew" style="margin-top:4px">${tags}</div>
+          </div>
+        </div>`;
+      }
+
+      const dow=DAYS[s.dt.getDay()];
+      const isWknd=s.dt.getDay()===0||s.dt.getDay()===5||s.dt.getDay()===6;
+      const dl=String(s.dt.getDate()).padStart(2,'0')+' '+MSHORT[s.dt.getMonth()];
+      const badge=s.client==='gsh'?`<span class="client-badge badge-gsh">GSH</span>`:s.client==='other'?`<span class="client-badge badge-other">Event</span>`:`<span class="client-badge badge-kd">Candlelight</span>`;
+      const crewHtml=s.crew.length?s.crew.map(crewTag).join(''):`<span class="crew-tag tag-gap">No crew assigned</span>`;
+      const confNote=s.conflictInfo?s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.client.toUpperCase()}: ${c.show}`).join(' · '):'';
+      const cardCls=['show-card',`client-${s.client}`,s.hasGap&&!s.hasConflict?'has-gap':'',s.hasConflict?'has-conflict':'',s.status==='Done'?'status-done':''].filter(Boolean).join(' ');
+
+      // Inline warehouse tags if someone is free on a show day
+      const wh = whByDate[s.dateStr];
+      const whTags = (wh && wh.crew.length)
+        ? wh.crew.map(name=>`<span class="crew-tag tag-warehouse" title="Free for warehouse today">🏭 ${name}</span>`).join('')
+        : '';
+
+      return `<div class="${cardCls}" onclick="toggleCard(this)">
+        <div class="show-date"><div class="dow${isWknd?' is-weekend':''}">${dow}</div><div>${dl}</div></div>
+        <div class="show-main">
+          <div class="show-title-row"><div class="show-name">${s.title}</div>${badge}</div>
+          <div class="show-venue">${s.venue}</div>
+          <div class="crew-row">${crewHtml}${whTags}</div>
+          ${s.note?`<div class="note-line">📌 ${s.note}</div>`:''}
+          ${confNote?`<div class="note-line" style="color:var(--warn)">⚠ ${confNote}</div>`:''}
+        </div>
+        <div class="flags">${statusPill(s)}<span class="chev">▾</span></div>
+        ${showDetail(s, wh ? wh.crew : [])}
+      </div>`;
+    }).join('');
+    html+=`<div class="month-group"><div class="month-header">${g.label}</div><div class="show-list">${cards}</div></div>`;
+  }
+  return html || emptyMsg;
+}
+
+// ── Calendar view ─────────────────────────────────────────────────────────
+function calPrev()  { calMonth--; if (calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function calNext()  { calMonth++; if (calMonth>11){calMonth=0;calYear++;} renderCal(); }
+function calToday() { calYear = TODAY.getFullYear(); calMonth = TODAY.getMonth(); renderCal(); }
+function isoStr(dt) { return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+
+function renderCal() {
+  document.getElementById('cal-label').textContent = MONTHS[calMonth]+' '+calYear;
+  const shows = filteredShows(true);
+  const byDate = {};
+  for (const s of shows) { if (!byDate[s.dateStr]) byDate[s.dateStr]=[]; byDate[s.dateStr].push(s); }
+  const whAll = buildWarehouseEntries(allShows);
+  const todayStr = isoStr(TODAY);
+  const WK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  // Grid starts on the Monday on/before the 1st and ends on the Sunday on/after the last day
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+  const start = new Date(calYear, calMonth, 1 - ((first.getDay()+6)%7));
+  const nDays = Math.ceil((((first.getDay()+6)%7) + last.getDate())/7)*7;
+
+  let html = WK.map(n=>`<div class="cal-dow">${n}</div>`).join('');
+  for (let i=0;i<nDays;i++) {
+    const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+    const ds = isoStr(dt);
+    const other = dt.getMonth()!==calMonth;
+    const dayShows = byDate[ds]||[];
+    const whDay = whAll.find(w=>w.dateStr===ds);
+    const whChip = whDay ? `<div class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${whDay.crew.join(' · ')}</div>` : '';
+    const MAXEV = 3;
+    const evHtml = dayShows.slice(0,MAXEV).map(s=>{
+      let cls='ev-gsh';
+      if (s.hasConflict) cls='ev-conflict';
+      else if (s.hasGap) cls='ev-gap';
+      else if (s.client==='kd') cls='ev-kd';
+      else if (s.status==='Done') cls='ev-done';
+      return `<span class="cal-event ${cls}" title="${s.title}">${s.title}</span>`;
+    }).join('') + (dayShows.length>MAXEV ? `<span class="cal-more">+${dayShows.length-MAXEV} more</span>` : '');
+    const ini = whDay ? whDay.crew.map(n=>String(n).trim()[0].toUpperCase()).join('') : '';
+    const whDot = whDay ? `<span class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${ini}</span>` : '';
+    const wknd = (dt.getDay()===0||dt.getDay()===5||dt.getDay()===6)?' weekend':'';
+    html += `<div class="cal-cell${ds===todayStr?' today':''}${wknd}${other?' other-month':''}" onclick="openDay('${ds}')"><div class="cal-day-num">${dt.getDate()}</div><div class="cal-dots">${evHtml}${whDot}</div></div>`;
+  }
+  const grid = document.getElementById('cal-grid');
+  grid.classList.remove('wk');
+  grid.innerHTML = html;
+}
+
+// ── Day sheet (tap a day in the calendar) ──
+function closeDay() { const m = document.getElementById('day-sheet'); if (m) m.remove(); document.removeEventListener('keydown', dayKey); }
+function dayKey(e) { if (e.key==='Escape') closeDay(); }
+function openDay(ds) {
+  closeDay();
+  const dt = d(ds);
+  const shows = filteredShows(true).filter(x=>x.dateStr===ds);
+  const wh = buildWarehouseEntries(allShows).find(w=>w.dateStr===ds);
+  const stripe = x => x.hasConflict?'var(--warn)':x.hasGap?'var(--gap)':x.client==='kd'?'var(--kd-mid)':x.client==='other'?'var(--accent)':'var(--gsh-mid)';
+  const items = shows.map(x=>`<div class="day-item" style="--stripe:${stripe(x)}">
+      <div class="day-item-top"><div class="show-name">${x.title}</div>${statusPill(x)}</div>
+      <div class="show-venue">${x.venue||''}</div>
+      <div class="crew-row">${x.crew.length ? x.crew.map(crewTag).join('') : '<span class="crew-tag tag-gap">No crew assigned</span>'}</div>
+      ${x.note?`<div class="note-line">${x.note}</div>`:''}
+      ${x.conflictInfo?`<div class="note-line" style="color:var(--warn)">⚠ ${x.conflictInfo.map(c=>c.who.join('+')+' also on '+c.show).join('; ')}</div>`:''}
+      ${canWrite?`<button class="nav-btn" style="margin-top:10px" onclick="closeDay();goEdit('${encK(x.key)}')">✎ Edit</button>`:''}
+    </div>`).join('');
+  const whHtml = (dt.getDay()!==0 && dt.getDay()!==6 && dt>=new Date(2026,10,1) && dt<new Date(2026,11,24))
+    ? `<div class="day-item" style="--stripe:#4a90a4"><div class="day-item-top"><div class="show-name">🏭 Warehouse</div></div><div class="crew-row">${wh ? wh.crew.map(n=>`<span class="crew-tag tag-warehouse">${n}</span>`).join('') : '<span class="crew-tag" style="background:var(--bg3);color:var(--fg3)">No one in the warehouse</span>'}</div></div>` : '';
+  const m = document.createElement('div');
+  m.className = 'modal-back'; m.id = 'day-sheet';
+  m.innerHTML = `<div class="modal" role="dialog" aria-label="Day details">
+    <div class="modal-head"><div class="modal-title">${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dt.getDay()]} ${dt.getDate()} ${MONTHS[dt.getMonth()]}</div><button class="modal-x" onclick="closeDay()" title="Close">×</button></div>
+    ${items || (whHtml ? '' : '<div class="empty" style="padding:24px 8px">Nothing on this day.</div>')}${whHtml}
+    <div style="height:4px"></div></div>`;
+  m.addEventListener('mousedown', e => { if (e.target===m) closeDay(); });
+  document.body.appendChild(m);
+  document.addEventListener('keydown', dayKey);
+}
+
+// ── Popup ─────────────────────────────────────────────────────────────────
+function showPopup(e, dateStr, idx) {
+  e.stopPropagation();
+  const shows = filteredShows(true);
+  const byDate = {};
+  for (const s of shows) { if (!byDate[s.dateStr]) byDate[s.dateStr]=[]; byDate[s.dateStr].push(s); }
+  const s = (byDate[dateStr]||[])[idx];
+  if (!s) return;
+
+  document.getElementById('pp-title').textContent  = s.title;
+  document.getElementById('pp-venue').textContent  = s.venue + ' · ' + DAYS[s.dt.getDay()] + ' ' + s.dt.getDate() + ' ' + MSHORT[s.dt.getMonth()];
+  document.getElementById('pp-status').textContent = s.status;
+  document.getElementById('pp-status').style.color = s.hasConflict?'var(--warn)':s.hasGap?'var(--gap)':s.status==='Booked'?'var(--ok)':'var(--fg2)';
+  document.getElementById('pp-note').textContent   = s.note || (s.conflictInfo ? '⚠ '+s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.show}`).join('; '):'');
+
+  const crewEl = document.getElementById('pp-crew');
+  if (s.crew.length) {
+    crewEl.innerHTML = s.crew.map(c=>{
+      const col = {rafa:'var(--rafa)',becky:'var(--becky)',donal:'var(--donal)',other:'var(--fg2)'}[c.type];
+      return `<span style="font-size:12px;color:${col};font-weight:500">${c.role?c.role+': ':''}<b>${c.name}</b></span>`;
+    }).join('');
+  } else {
+    crewEl.innerHTML = `<span style="color:var(--gap);font-size:12px;font-style:italic">No crew assigned</span>`;
+  }
+
+  const pop = document.getElementById('cal-popup');
+  pop.style.display='block';
+  pop.classList.add('visible');
+  // position near click
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let left = e.clientX + 10, top = e.clientY + 10;
+  if (left + 300 > vw) left = e.clientX - 310;
+  if (top + 200 > vh)  top  = e.clientY - 210;
+  pop.style.left = left + 'px';
+  pop.style.top  = top  + 'px';
+}
+function closePopup() {
+  const p = document.getElementById('cal-popup');
+  p.style.display='none'; p.classList.remove('visible');
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('cal-popup').contains(e.target)) closePopup();
+});
+
+// ── Crew view ─────────────────────────────────────────────────────────────
+function renderCrew() {
+  const shows = allShows; // use full dataset, not filtered
+  const whEntries = buildWarehouseEntries(shows);
+  const whByDate = {};
+  for (const w of whEntries) whByDate[w.dateStr] = w.crew;
+
+  const MEMBERS = [
+    {key:'rafa',  label:'Rafa Ruis',      hdrCls:'rafa-hdr',  role:'GSH Lead',
+      hasDay: s => s.hasRafa,  warehouseEligible: true},
+    {key:'becky', label:'Becky Corrigan',  hdrCls:'becky-hdr', role:'KD Primary / GSH #1',
+      hasDay: s => s.hasBecky, warehouseEligible: true},
+    {key:'donal', label:'Donal',           hdrCls:'donal-hdr', role:'GSH #2',
+      hasDay: s => s.hasDonal, warehouseEligible: true},
+  ];
+
+  // Gather date range: Nov 1 – Dec 31 2026
+  const start = new Date(2026,10,1);
+  const end   = new Date(2026,11,31);
+
+  // Group all days into ISO weeks
+  const weeks = []; // [{label, days:[{ds,dow,dt}]}]
+  let curWeek = null, curWkKey = null;
+  for (let dt=new Date(start); dt<=end; dt.setDate(dt.getDate()+1)) {
+    const tmp=new Date(dt); tmp.setDate(tmp.getDate()+4-((tmp.getDay()||7)));
+    const wk=tmp.getFullYear()*100+Math.ceil((((tmp-new Date(tmp.getFullYear(),0,1))/86400000)+1)/7);
+    const ds=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    if (wk!==curWkKey) {
+      // label: Mon of this week
+      const mon=new Date(dt); mon.setDate(mon.getDate()-((mon.getDay()||7)-1));
+      const fri=new Date(mon); fri.setDate(fri.getDate()+4);
+      const fmt=d=>String(d.getDate()).padStart(2,'0')+' '+MSHORT[d.getMonth()];
+      curWeek={label:`${fmt(mon)} – ${fmt(fri)}`, days:[]};
+      weeks.push(curWeek); curWkKey=wk;
+    }
+    curWeek.days.push({ds, dow:DAYS[dt.getDay()], dt:new Date(dt)});
+  }
+
+  const panels = MEMBERS.map(m => {
+    let showCount=0, whCount=0;
+    const weekHtml = weeks.map(wk => {
+      const dayRows = wk.days.map(({ds,dow,dt}) => {
+        const dow0=dt.getDay();
+        const isWknd=dow0===0||dow0===6;
+        const dayShows=shows.filter(s=>s.dateStr===ds&&m.hasDay(s)&&s.status!=='Done');
+        const isWh = m.warehouseEligible && (whByDate[ds]||[]).includes(m.label.split(' ')[0]);
+        if (!dayShows.length && !isWh) return '';
+        if (dayShows.length) showCount++;
+        if (isWh) whCount++;
+        const pills = dayShows.map(s=>{
+          const cls = s.client==='gsh'?'pill-gsh':s.client==='other'?'pill-wh':'pill-kd';
+          const short = s.client==='gsh'?'GSH':s.client==='other'?'EVT':'KD';
+          return `<span class="crew-day-pill ${cls}">${short}</span>`;
+        }).join('');
+        const whPill = isWh ? `<span class="crew-day-pill pill-wh">🏭 WH</span>` : '';
+        const detail = dayShows.map(s=>s.title.length>28?s.title.slice(0,27)+'…':s.title).join(' + ');
+        return `<div class="crew-day">
+          <span class="crew-day-dow">${dow}</span>
+          <span class="crew-day-date">${String(dt.getDate()).padStart(2,'0')} ${MSHORT[dt.getMonth()]}</span>
+          ${pills}${whPill}
+          ${detail?`<span class="crew-day-detail">${detail}</span>`:''}
+        </div>`;
+      }).join('');
+      if (!dayRows.trim()) return '';
+      return `<div class="crew-week"><div class="crew-week-label">w/c ${wk.label}</div>${dayRows}</div>`;
+    }).join('');
+
+    return `<div class="crew-panel">
+      <div class="crew-panel-header ${m.hdrCls}">
+        <span>${m.label}</span>
+        <span style="font-weight:400;font-size:11px;opacity:0.75">${m.role}</span>
+      </div>
+      ${weekHtml}
+      <div class="crew-total">
+        <span>Shows: <b>${showCount}</b></span>
+        ${m.warehouseEligible?`<span>Warehouse: <b>${whCount}</b></span>`:''}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('crew-schedule').innerHTML = `<div class="crew-grid">${panels.join('')}</div>`;
+}
+
+// ── Main render ───────────────────────────────────────────────────────────
+// ── Expand / edit helpers ──
+function toggleCard(el) { el.classList.toggle('open'); }
+
+function showDetail(s, whCrew) {
+  const full = s.dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const crewRows = s.crew.length
+    ? s.crew.map(c=>`<div class="dt-row"><span class="dt-k">${c.role||'Crew'}</span><span>${c.name}</span></div>`).join('')
+    : `<div class="dt-row" style="color:var(--gap)">No crew assigned</div>`;
+  const need = (s.hasGap && s.crew.length) ? `<div class="dt-row" style="color:var(--gap)">⚠ More crew needed</div>` : '';
+  const wh = whCrew.length ? `<div class="dt-row"><span class="dt-k">Warehouse</span><span>${whCrew.join(', ')}</span></div>` : '';
+  const note = s.note ? `<div class="dt-row"><span class="dt-k">Note</span><span>${s.note}</span></div>` : '';
+  const conf = s.conflictInfo ? `<div class="dt-row" style="color:var(--warn)"><span class="dt-k">Conflict</span><span>${s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.client.toUpperCase()}: ${c.show}`).join(' · ')}</span></div>` : '';
+  const enc = encK(s.key);
+  return `<div class="show-detail" onclick="event.stopPropagation()">
+    <div class="dt-grid">
+      <div><div class="dt-h">${full}</div>
+        <div class="dt-row"><span class="dt-k">Venue</span><span>${s.venue}</span></div>
+        <div class="dt-row"><span class="dt-k">Status</span><span>${s.status}</span></div>
+        ${wh}${note}${conf}</div>
+      <div><div class="dt-h">Crew</div>${crewRows}${need}</div>
+    </div>
+    <button class="nav-btn" onclick="goEdit('${enc}')">✎ Edit crew</button>
+  </div>`;
+}
+
+function goEdit(enc) {
+  switchView('edit');
+  setTimeout(()=>{
+    const r = [...document.querySelectorAll('.edit-row')].find(x=>x.dataset.key===enc);
+    if (r) { r.scrollIntoView({block:'center'}); r.classList.add('flash'); setTimeout(()=>r.classList.remove('flash'),1500); }
+  },30);
+}
+
+function crewNames() {
+  const set = new Set(['Rafa','Becky','Donal']);
+  for (const s of kdRaw) for (const k of ['foh','mons','patch']) {
+    const v = s.crew[k];
+    if (v && v!=='TBC' && v!=='local') set.add(v);
+  }
+  return [...set].sort();
+}
+
+function mkSel(opts, val, kind, field, enc, blank, label) {
+  if (val==='TBC') val = '';
+  const list = (val && !opts.includes(val)) ? [...opts, val] : opts;
+  return `<label class="edit-field"><span>${label}</span><select data-key="${enc}" data-kind="${kind}" data-field="${field}" onchange="onCrewChange(this)"${canWrite?'':' disabled'}><option value="">${blank}</option>${list.map(n=>`<option${n===val?' selected':''}>${n}</option>`).join('')}</select></label>`;
+}
+
+function mkIn(val, kind, field, enc, blank, label, listId) {
+  if (val==='TBC' || val==null) val = '';
+  const v = String(val).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  return `<label class="edit-field"><span>${label}</span><span class="xwrap"><input class="edit-input" type="text" list="${listId}" autocomplete="off" maxlength="60" placeholder="${blank}" value="${v}" data-key="${enc}" data-kind="${kind}" data-field="${field}" onchange="onCrewChange(this)"${canWrite?'':' disabled'}>${canWrite?'<button type="button" class="xbtn" tabindex="-1" title="Remove" onclick="clearCrewBox(this)">×</button>':''}</span></label>`;
+}
+// re-render after a crew edit without losing the field the user tabbed/clicked into
+function rerenderKeepFocus() {
+  setTimeout(() => {
+    const ae = document.activeElement;
+    let keep = null;
+    if (ae && ae.closest && ae.closest('#edit-schedule') && ae.dataset && ae.dataset.key) keep = [ae.dataset.key, ae.dataset.field];
+    render();
+    if (keep) {
+      const el = [...document.querySelectorAll('#edit-schedule input[data-key]')].find(x => x.dataset.key===keep[0] && x.dataset.field===keep[1]);
+      if (el) { el.focus(); try { el.setSelectionRange(el.value.length, el.value.length); } catch(e){} }
+    }
+  }, 0);
+}
+let slotMin = {}; // slots the user has opened with + (kept on re-render, so empty ones don't vanish)
+function clearCrewBox(btn) {
+  const inp = btn.parentElement.querySelector('input');
+  if (!inp) return;
+  inp.value = '';
+  if (inp.dataset.key) onCrewChange(inp, true); else inp.focus();
+}
+function addEditSlot(btn) {
+  const row = btn.closest('.edit-row');
+  const n = row.querySelectorAll('input[data-kind="gsh"]').length;
+  if (n>=5) return;
+  slotMin[decodeURIComponent(row.dataset.key)] = n+1;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'gsh','slot'+n,row.dataset.key,'Name','Crew '+(n+1),'dl-crew3'));
+  const inp = row.querySelector('input[data-field="slot'+n+'"]');
+  if (n+1>=5) cell.remove();
+  if (inp) inp.focus();
+}
+function whEditRow(ds, crew) {
+  const key = 'WH|'+ds, enc = encK(key);
+  const dt = d(ds);
+  const n = Math.min(5, Math.max(3, crew.length, slotMin[key]||0));
+  let fields = '';
+  for (let i=0;i<n;i++) fields += mkIn(crew[i]||'', 'wh','slot'+i,enc,'Name','Person '+(i+1),'dl-crew3');
+  if (n<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addWhSlot(this)" title="Add another person (up to 5)">+</button></div>`;
+  const reset = WHOVR[ds] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetWh('${ds}')">↺ Reset</button>` : '';
+  return `<div class="edit-row wh-row${WHOVR[ds]?' edited':''}" data-key="${enc}">
+    <div class="edit-head"><span class="edit-date" style="min-width:90px;font-weight:600">${DAYS[dt.getDay()]} ${dt.getDate()} ${MSHORT[dt.getMonth()]}</span><span class="tag-warehouse" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px">🏭 Warehouse</span>${reset}</div>
+    <div class="edit-fields">${fields}</div>
+  </div>`;
+}
+function addWhSlot(btn) {
+  const row = btn.closest('.edit-row');
+  const n = row.querySelectorAll('input[data-kind="wh"]').length;
+  if (n>=5) return;
+  slotMin[decodeURIComponent(row.dataset.key)] = n+1;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'wh','slot'+n,row.dataset.key,'Name','Person '+(n+1),'dl-crew3'));
+  const inp = row.querySelector('input[data-field="slot'+n+'"]');
+  if (n+1>=5) cell.remove();
+  if (inp) inp.focus();
+}
+function onWhChange(el, removing) {
+  const key = decodeURIComponent(el.dataset.key), ds = key.slice(3);
+  const row = el.closest('.edit-row');
+  const seen = new Set(), names = [];
+  row.querySelectorAll('input[data-kind="wh"]').forEach(x => {
+    let n = cleanTxt(x.value).replace(/,/g,' ').trim();
+    if (!n) return;
+    const low = n.toLowerCase();
+    if (low==='rafa'||low==='becky'||low==='donal') n = low[0].toUpperCase()+low.slice(1);
+    if (seen.has(low) || names.length>=5) return; seen.add(low); names.push(n);
+  });
+  slotMin[key] = removing ? Math.max(3, names.length) : Math.max(slotMin[key]||0, row.querySelectorAll('input[data-kind="wh"]').length);
+  WHOVR[ds] = {crew:names};
+  saveWh(); pushWh(ds); rerenderKeepFocus();
+}
+function resetWh(ds) { delete WHOVR[ds]; delete slotMin['WH|'+ds]; saveWh(); pushWh(ds); render(); }
+function addKdSlot(btn) {
+  const row = btn.closest('.edit-row');
+  const n = row.querySelectorAll('input[data-kind="kdx"]').length;
+  if (n>=2) return;
+  slotMin[decodeURIComponent(row.dataset.key)] = n+1;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'kdx','extra'+n,row.dataset.key,'Name','Crew '+(4+n),'dl-names'));
+  const inp = row.querySelector('input[data-field="extra'+n+'"]');
+  if (n+1>=2) cell.remove();
+  if (inp) inp.focus();
+}
+function addKdModalSlot(btn) {
+  const grid = btn.closest('.modal-grid');
+  const n = grid.querySelectorAll('input[id^="add-x"]').length;
+  if (n>=2) return;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', addIn('add-x'+(n+1),'Crew '+(4+n),'add-names','Name'));
+  if (n+1>=2) cell.remove();
+  const inp = document.getElementById('add-x'+(n+1)); if (inp) inp.focus();
+}
+function addModalSlot(btn) {
+  const grid = btn.closest('.modal-grid');
+  const n = grid.querySelectorAll('input[id^="add-c"]').length;
+  if (n>=5) return;
+  const cell = btn.closest('.slot-plus');
+  cell.insertAdjacentHTML('beforebegin', addIn('add-c'+(n+1),'Crew '+(n+1),'add-names','Name'));
+  if (n+1>=5) cell.remove();
+  const inp = document.getElementById('add-c'+(n+1)); if (inp) inp.focus();
+}
+function onTempClear(enc) { const key = decodeURIComponent(enc); const cur = {...(OVR[key]||{})}; delete cur.temp; if (Object.keys(cur).length) OVR[key]=cur; else delete OVR[key]; saveOVR(); allShows = buildShows(); render(); pushOvr(key); }
+function onCrewChange(el, removing) {
+  if (el.dataset.kind==='wh') return onWhChange(el, removing);
+  const key = decodeURIComponent(el.dataset.key);
+  if (el.dataset.kind==='gsh') {
+    const row = el.closest('.edit-row');
+    const seen = new Set(), slots = [];
+    row.querySelectorAll('input[data-kind="gsh"]').forEach(x => {
+      let n = cleanTxt(x.value).replace(/,/g,' ').trim();
+      if (!n) return;
+      const low = n.toLowerCase();
+      if (low==='rafa'||low==='becky'||low==='donal') n = low[0].toUpperCase()+low.slice(1);
+      if (seen.has(low) || slots.length>=5) return; seen.add(low); slots.push(n);
+    });
+    slotMin[key] = removing ? Math.max(3, slots.length) : Math.max(slotMin[key]||0, row.querySelectorAll('input[data-kind="gsh"]').length);
+    OVR[key] = {...(OVR[key]||{}), slots};
+  } else if (el.dataset.kind==='kdx') {
+    const row = el.closest('.edit-row');
+    const ex = [];
+    row.querySelectorAll('input[data-kind="kdx"]').forEach(x => {
+      const n = cleanTxt(x.value).replace(/,/g,' ').trim();
+      if (n && ex.length<2 && !ex.some(e=>e.toLowerCase()===n.toLowerCase())) ex.push(n);
+    });
+    slotMin[key] = removing ? ex.length : Math.max(slotMin[key]||0, row.querySelectorAll('input[data-kind="kdx"]').length);
+    OVR[key] = {...(OVR[key]||{}), extra:ex};
+  } else {
+    OVR[key] = {...(OVR[key]||{}), [el.dataset.field]: cleanTxt(el.value)};
+  }
+  saveOVR(); allShows = buildShows(); pushOvr(key); rerenderKeepFocus();
+}
+function onMetaChange(el) {
+  const key = decodeURIComponent(el.dataset.key);
+  const val = el.value.trim();
+  if (!val) { render(); return; }
+  OVR[key] = {...(OVR[key]||{}), [el.dataset.field]: val};
+  saveOVR(); allShows = buildShows(); render(); pushOvr(key);
+}
+function todayISO() { const t=new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
+function addSel(id, label, opts, blank) {
+  return `<label class="edit-field"><span>${label}</span><select id="${id}"><option value="">${blank}</option>${opts.map(n=>`<option>${n}</option>`).join('')}</select></label>`;
+}
+function addIn(id, label, listId, ph) {
+  return `<label class="edit-field"><span>${label}</span><span class="xwrap"><input class="edit-input" type="text" id="${id}" list="${listId}" placeholder="${ph}" maxlength="60" autocomplete="off"><button type="button" class="xbtn" tabindex="-1" title="Remove" onclick="clearCrewBox(this)">×</button></span></label>`;
+}
+function addCrewHtml(type) {
+  if (type==='kd') {
+    const n = crewNames();
+    return `<div class="modal-grid">${addIn('add-foh','FOH','add-names','Name')}${addIn('add-mons','Mons','add-names','Name')}${addIn('add-patch','Patch','add-names','Name')}<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" type="button" onclick="addKdModalSlot(this)" title="Add another person (up to 5)">+</button></div></div>
+      <datalist id="add-names">${n.map(x=>`<option value="${x}"></option>`).join('')}</datalist>`;
+  }
+  return `<div class="modal-grid">${[1,2,3].map(i=>addIn('add-c'+i,'Crew '+i,'add-names','Name')).join('')}<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" type="button" onclick="addModalSlot(this)" title="Add another person (up to 5)">+</button></div></div>
+    <datalist id="add-names">${['Rafa','Becky','Donal'].map(x=>`<option value="${x}"></option>`).join('')}</datalist>
+    <div style="font-size:10px;color:var(--fg3);margin-top:6px">Any other name typed here is a one-off for this event only.</div>`;
+}
+function onAddType() {
+  const t = document.getElementById('add-type').value;
+  document.getElementById('add-crew').innerHTML = addCrewHtml(t);
+  const v = document.getElementById('add-venue');
+  if (v && (!v.value || v.dataset.auto==='1')) { v.value = t==='gsh' ? 'Guinness Storehouse' : ''; v.dataset.auto='1'; }
+}
+function closeAdd() {
+  const m = document.getElementById('add-modal'); if (m) m.remove();
+  document.removeEventListener('keydown', addKey);
+}
+function addKey(e) { if (e.key==='Escape') closeAdd(); }
+function openAdd() {
+  if (document.getElementById('add-modal')) return;
+  const venues = [...new Set(allShows.map(x=>x.venue).filter(v=>v && v!=='TBC'))].sort();
+  const m = document.createElement('div');
+  m.className = 'modal-back'; m.id = 'add-modal';
+  m.innerHTML = `<div class="modal" role="dialog" aria-label="Add event">
+    <div class="modal-head"><div class="modal-title">Add event</div><button class="modal-x" onclick="closeAdd()" title="Close">×</button></div>
+    <div class="modal-grid">
+      <label class="edit-field"><span>Date</span><input class="edit-input" type="date" id="add-date" value="${todayISO()}"></label>
+      <label class="edit-field"><span>Type</span><select id="add-type" onchange="onAddType()"><option value="gsh">Guinness Storehouse</option><option value="kd">Candlelight</option><option value="other">Other event</option></select></label>
+      <label class="edit-field full"><span>Event name</span><input class="edit-input" type="text" id="add-title" placeholder="Event name" maxlength="120"></label>
+      <label class="edit-field full"><span>Venue</span><input class="edit-input" type="text" id="add-venue" list="add-venue-list" placeholder="Venue" maxlength="120" data-auto="1" value="Guinness Storehouse" oninput="this.dataset.auto='0'"></label>
+      <label class="edit-field"><span>Status</span><select id="add-status"><option>Booked</option><option>Planned</option><option>TBC</option></select></label>
+    </div>
+    <div class="modal-sub">Crew</div>
+    <div id="add-crew">${addCrewHtml('gsh')}</div>
+    <datalist id="add-venue-list">${venues.map(v=>`<option value="${v.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>
+    <div class="modal-actions"><span class="modal-err" id="add-err"></span><button class="nav-btn" onclick="closeAdd()">Cancel</button><button class="nav-btn btn-primary" onclick="saveAdd()">Save</button></div>
+  </div>`;
+  m.addEventListener('mousedown', e => { if (e.target===m) closeAdd(); });
+  document.body.appendChild(m);
+  document.addEventListener('keydown', addKey);
+  document.getElementById('add-title').focus();
+}
+function saveAdd() {
+  const g = id => (document.getElementById(id)||{}).value || '';
+  const err = document.getElementById('add-err');
+  const type = g('add-type'), date = g('add-date'), title = cleanTxt(g('add-title')), venue = cleanTxt(g('add-venue'));
+  if (!date) { err.textContent = 'Please choose a date.'; return; }
+  if (!title) { err.textContent = 'Please enter an event name.'; return; }
+  let crew = {};
+  if (type==='kd') {
+    if (cleanTxt(g('add-foh'))) crew.foh = cleanTxt(g('add-foh'));
+    if (cleanTxt(g('add-mons'))) crew.mons = cleanTxt(g('add-mons'));
+    if (cleanTxt(g('add-patch'))) crew.patch = cleanTxt(g('add-patch'));
+    const ex = [g('add-x1'),g('add-x2')].map(v=>cleanTxt(v).replace(/,/g,' ').trim()).filter(Boolean);
+    if (ex.length) crew.extra = ex;
+  } else {
+    const others = [];
+    [1,2,3,4,5].map(i=>g('add-c'+i)).map(v=>cleanTxt(v).replace(/,/g,' ').trim()).filter(Boolean).forEach(n => {
+      const low = n.toLowerCase();
+      if (low==='rafa'||low==='becky'||low==='donal') crew[low] = true;
+      else if (!others.some(o=>o.toLowerCase()===low)) others.push(n);
+    });
+    if (others.length) crew.other = others.join(', ');
+  }
+  const ev = { id:'ce-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), client:type, date, title, venue, status:g('add-status')||'Booked', crew };
+  CUSTOM = [...CUSTOM, ev]; saveCustom();
+  if (DB) Promise.resolve(DB.collection('customEvents').doc(ev.id).set(ev)).catch(()=>{});
+  closeAdd(); allShows = buildShows();
+  if (d(date) < TODAY) editPast = true; // so a past event you just added is visible in the Edit tab
+  render();
+}
+let delArm = null;
+function delCustom(btn, id) {
+  if (delArm !== id) { delArm = id; btn.textContent = 'Click again to delete'; setTimeout(()=>{ if (delArm===id) { delArm=null; if (btn.isConnected) btn.textContent='🗑 Delete'; } }, 3000); return; }
+  delArm = null;
+  CUSTOM = CUSTOM.filter(x=>x.id!==id); saveCustom();
+  if (DB) Promise.resolve(DB.collection('customEvents').doc(id).delete()).catch(()=>{});
+  allShows = buildShows(); render();
+}
+function onTempChange(el) {
+  const key = decodeURIComponent(el.dataset.key);
+  const val = tempNames({temp:el.value}).join(', ');
+  const cur = {...(OVR[key]||{})};
+  if (val) cur.temp = val; else delete cur.temp;
+  if (Object.keys(cur).length) OVR[key] = cur; else delete OVR[key];
+  saveOVR(); allShows = buildShows(); render(); pushOvr(key);
+}
+function resetOne(enc) { const k = decodeURIComponent(enc); delete OVR[k]; saveOVR(); allShows = buildShows(); render(); pushOvr(k); }
+function resetAll() { const ks = Object.keys(OVR); OVR = {}; saveOVR(); allShows = buildShows(); render(); ks.forEach(k => pushOvr(k)); }
+
+let editPast = false;
+function toggleEditPast() { editPast = !editPast; render(); }
+function renderEdit() {
+  const showPast = editPast || scopeMode==='all';
+  const names = crewNames();
+  const crew3 = ['Rafa','Becky','Donal'];
+  let shows = allShows.filter(s => showPast || (s.dt>=TODAY && s.status!=='Done'));
+  shows = shows.filter(s => s.client==='kd' ? activeFilters.kd : activeFilters.gsh);
+  const nOvr = Object.keys(OVR).length;
+  const groups = {};
+  for (const s of shows) {
+    const k = s.dt.getFullYear()+'-'+String(s.dt.getMonth()+1).padStart(2,'0');
+    if (!groups[k]) groups[k] = {label:MONTHS[s.dt.getMonth()]+' '+s.dt.getFullYear(), rows:[]};
+    groups[k].rows.push({s, dt:s.dt, o:0});
+  }
+  // Warehouse days (weekdays 1 Nov – 23 Dec): editable crew for each day
+  {
+    const WH_A = new Date(2026, 10, 1), WH_B = new Date(2026, 11, 24);
+    let from = showPast ? WH_A : TODAY; if (from < WH_A) from = WH_A;
+    const whMap = {}; buildWarehouseEntries(allShows).forEach(w => whMap[w.dateStr] = w.crew);
+    const evDates = new Set(allShows.map(x=>x.dateStr));
+    for (let dt = new Date(from); dt < WH_B; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
+      if (dt.getDay()===0 || dt.getDay()===6) continue;
+      const ds = isoStr(dt);
+      if (evDates.has(ds) && !(whMap[ds]||[]).length && !WHOVR[ds]) continue; // event day, nobody in warehouse: no row
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), rows:[]};
+      groups[k].rows.push({wh:ds, dt:new Date(dt), o:1, crew:whMap[ds]||[]});
+    }
+    for (const g of Object.values(groups)) g.rows.sort((a,b)=>(a.dt-b.dt)||(a.o-b.o));
+  }
+  let html = (!syncOn ? `<div class="edit-bar" style="color:var(--warn);background:var(--warn-bg)"><span>⚠ Not connected to shared storage — changes only save on this device.</span></div>` : '') + `<div class="edit-bar"><span>${canWrite ? 'Edit the date, title, location or crew, and who is in the warehouse each day. Changes save automatically and update live for everyone using this planner.' : 'View only — you need Contributor access to make changes.'}</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip${showPast?' on':''}" style="${showPast?'border-color:var(--accent);color:var(--accent);background:var(--accent-bg)':''}" onclick="toggleEditPast()" ${scopeMode==='all'?'disabled title="Already showing all dates (All 2026–27)"':''}>🕘 Past dates</button>${canWrite?`<button class="nav-btn btn-primary" onclick="openAdd()">+ Add</button>`:''}${nOvr?`<button class="nav-btn" onclick="resetAll()">Reset all edits (${nOvr})</button>`:''}</span></div>`;
+  for (const [gk, g] of Object.entries(groups).sort((x,y)=>x[0]<y[0]?-1:1)) {
+    html += `<div class="month-group"><div class="month-header">${g.label}</div>`;
+    for (const it of g.rows) {
+      if (it.wh) { html += whEditRow(it.wh, it.crew); continue; }
+      const s = it.s;
+      const enc = encK(s.key);
+      const isKd = s.client==='kd';
+      const badge = s.client==='gsh' ? `<span class="client-badge badge-gsh">GSH</span>` : s.client==='other' ? `<span class="client-badge badge-other">Event</span>` : `<span class="client-badge badge-kd">Candlelight</span>`;
+      let fields = '', extra = '';
+      if (isKd) {
+        fields = mkIn(s.c.foh, 'kd','foh',enc,'TBC','FOH','dl-names') + mkIn(s.c.mons, 'kd','mons',enc,'TBC','Mons','dl-names') + mkIn(s.c.patch, 'kd','patch',enc,'TBC','Patch','dl-names');
+        const ex = s.extras||[];
+        const nEx = Math.min(2, Math.max(ex.length, slotMin[s.key]||0));
+        for (let i=0;i<nEx;i++) fields += mkIn(ex[i]||'', 'kdx','extra'+i,enc,'Name','Crew '+(4+i),'dl-names');
+        if (nEx<2 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addKdSlot(this)" title="Add another person (up to 5)">+</button></div>`;
+        const loc = (s.c.local ? (Array.isArray(s.c.local)?s.c.local:[s.c.local]) : []);
+      } else {
+        const cur = crew3.filter(n => s.c[n.toLowerCase()]).concat(s.typed||[]).slice(0,5);
+        const nSlots = Math.min(5, Math.max(3, cur.length, slotMin[s.key]||0));
+        for (let i=0;i<nSlots;i++) fields += mkIn(cur[i]||'', 'gsh','slot'+i,enc,'Name','Crew '+(i+1),'dl-crew3');
+        if (nSlots<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addEditSlot(this)" title="Add another person (up to 5)">+</button></div>`;
+      }
+      const legacyTmp = (OVR[s.key] && OVR[s.key].temp) ? `<div class="edit-extra">Temp: ${OVR[s.key].temp} <button class="nav-btn" style="padding:1px 8px;font-size:10px" onclick="onTempClear('${enc}')"${canWrite?'':' disabled'}>clear</button></div>` : '';
+      const flag = s.hasConflict ? `<span class="status-pill pill-conflict">⚠ Conflict</span>` : s.hasGap ? `<span class="status-pill pill-gap">⚠ Gap</span>` : '';
+      const conf = s.conflictInfo ? `<div class="edit-extra" style="color:var(--warn)">⚠ ${s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.client.toUpperCase()}: ${c.show}`).join(' · ')}</div>` : '';
+      const del = (s.custom && canWrite) ? `<button class="nav-btn btn-danger" onclick="delCustom(this,'${s.custom}')">🗑 Delete</button>` : '';
+      const reset = OVR[s.key] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetOne('${enc}')">↺ Reset</button>` : '';
+      html += `<div class="edit-row${s.hasConflict?' has-conflict':s.hasGap?' has-gap':''}${OVR[s.key]?' edited':''}" data-key="${enc}">
+        <div class="edit-head"><input class="edit-input" type="date" value="${s.dateStr}" data-key="${enc}" data-field="date" onchange="onMetaChange(this)"${canWrite?'':' disabled'}><input class="edit-input edit-title-input" type="text" value="${s.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="title" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${badge}<input class="edit-input edit-venue-input" type="text" list="venue-list" placeholder="Location" value="${String(s.venue).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="venue" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${flag}${reset}${del}</div>
+        <div class="edit-fields">${fields}</div>${extra}${legacyTmp}${conf}
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  html += `<datalist id="dl-crew3">${crew3.map(n=>`<option value="${n}"></option>`).join('')}</datalist><datalist id="dl-names">${names.map(n=>`<option value="${n.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>`;
+  const venues = [...new Set(allShows.map(x=>x.venue).filter(v=>v && v!=='TBC'))].sort();
+  html += `<datalist id="venue-list">${venues.map(v=>`<option value="${String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>`;
+  document.getElementById('edit-schedule').innerHTML = shows.length ? html : `<div class="empty"><div class="icon">📋</div><p>No shows to edit.</p></div>`;
+}
+
+// ── Period filter (All tab): all dates / by week (Mon–Sun) / by month ──
+let periodMode = 'all';
+let periodAnchor = new Date(TODAY);
+function periodRange() {
+  const a = periodAnchor;
+  if (periodMode==='week') {
+    const st = new Date(a.getFullYear(), a.getMonth(), a.getDate() - ((a.getDay()+6)%7));
+    return [st, new Date(st.getFullYear(), st.getMonth(), st.getDate()+7)];
+  }
+  const st = new Date(a.getFullYear(), a.getMonth(), 1);
+  return [st, new Date(st.getFullYear(), st.getMonth()+1, 1)];
+}
+function setPeriod(v) { periodMode = v; periodAnchor = new Date(TODAY); render(); }
+function periodStep(n) {
+  const a = periodAnchor;
+  periodAnchor = periodMode==='week' ? new Date(a.getFullYear(), a.getMonth(), a.getDate()+7*n)
+                                     : new Date(a.getFullYear(), a.getMonth()+n, 1);
+  render();
+}
+function periodToday() { periodAnchor = new Date(TODAY); render(); }
+function periodLabel() {
+  const [st, en] = periodRange();
+  if (periodMode==='month') return MONTHS[st.getMonth()]+' '+st.getFullYear();
+  const e = new Date(en.getFullYear(), en.getMonth(), en.getDate()-1);
+  if (st.getFullYear()!==e.getFullYear()) return `${st.getDate()} ${MSHORT[st.getMonth()]} ${st.getFullYear()} – ${e.getDate()} ${MSHORT[e.getMonth()]} ${e.getFullYear()}`;
+  if (st.getMonth()!==e.getMonth()) return `${st.getDate()} ${MSHORT[st.getMonth()]} – ${e.getDate()} ${MSHORT[e.getMonth()]} ${e.getFullYear()}`;
+  return `${st.getDate()} – ${e.getDate()} ${MONTHS[e.getMonth()]} ${e.getFullYear()}`;
+}
+
+function render() {
+  const usePeriod = viewMode==='list' && periodMode!=='all';
+  let shows = filteredShows(usePeriod);
+  if (usePeriod) { const [st,en] = periodRange(); shows = shows.filter(x => x.dt>=st && x.dt<en); }
+  renderStats(shows);
+  if (viewMode==='list') {
+    document.getElementById('period-nav').style.display = usePeriod ? 'inline-flex' : 'none';
+    if (usePeriod) document.getElementById('period-label').textContent = periodLabel();
+    document.getElementById('schedule').innerHTML = renderList(shows, usePeriod ? periodRange() : null);
+  } else if (viewMode==='cal') {
+    renderCal();
+  } else if (viewMode==='edit') {
+    renderEdit();
+  } else {
+    renderCrew();
+  }
+}
+
+// ── Theme ─────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const root = document.documentElement;
+  const btn = document.querySelector('.theme-btn');
+  root.dataset.theme = (!root.dataset.theme || root.dataset.theme==='light') ? 'dark' : 'light';
+  btn.textContent = root.dataset.theme==='dark' ? '☾' : '☀';
+}
+
+// init
+document.body.dataset.view = 'list';
+document.getElementById('list-view').style.display='block';
+document.getElementById('cal-view').style.display='none';
+render();
+</script>
+
+</body></html>
