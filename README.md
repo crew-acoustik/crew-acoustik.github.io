@@ -539,6 +539,62 @@ Acoustik Crew
   .lock-btn { width:100%; min-height:50px; font-size:16px; }
   .lock-card.shake { animation:shake .35s; }
   @keyframes shake { 20%,60% { transform:translateX(-8px) } 40%,80% { transform:translateX(8px) } }
+
+  /* ── proportion pass: bigger top bar, calmer body sizes (tab bar unchanged) ── */
+  body { font-size:14px; }
+  .app-bar { --bar-h:70px; height:70px; margin-bottom:6px; }
+  .app-title b { font-size:30px; letter-spacing:-.035em; }
+  .app-title small { font-size:12.5px; letter-spacing:.1em; margin-top:3px; }
+  .icon-btn { width:44px; height:44px; font-size:18px; }
+  .pill-btn { height:44px; padding:0 16px; font-size:14px; }
+  .app-actions { gap:9px; }
+
+  .summary-row { gap:8px; margin:2px -14px 8px; }
+  .stat-card { min-width:100px; padding:8px 12px; border-radius:15px; }
+  .stat-card .label { font-size:9px; }
+  .stat-card .val { font-size:20px; }
+  .stat-card .sub { font-size:10px; }
+  .legend { gap:12px; }
+  .legend-item { font-size:11px; }
+  .filters { gap:7px; margin-bottom:10px; }
+  .filter-label { font-size:11px; }
+  .chip { padding:6px 12px; font-size:12px; }
+  .nav-btn { min-height:34px; padding:0 13px; font-size:12px; }
+
+  .month-header { font-size:11px; padding:12px 2px 7px; }
+  .show-list { gap:8px; }
+  .show-card { border-radius:16px; padding:10px 12px 10px 15px; grid-template-columns:50px 1fr auto; gap:6px 10px; }
+  .show-date { border-radius:12px; padding:6px 2px; }
+  .show-date .dow { font-size:9px; }
+  .show-date > div:last-child { font-size:12px; }
+  .show-name { font-size:14px; }
+  .show-venue { font-size:12px; }
+  .client-badge { font-size:9px; padding:2px 7px; }
+  .crew-row { gap:5px; margin-top:6px; }
+  .crew-tag { font-size:11px; padding:3px 8px; }
+  .crew-role { font-size:8px; }
+  .status-pill { font-size:9px; padding:3px 8px; }
+  .note-line { font-size:11px; }
+  .show-detail { font-size:12px; }
+  .warehouse-card { border-radius:16px; padding:9px 12px 9px 15px; grid-template-columns:50px 1fr; gap:8px; }
+  .warehouse-label { font-size:11px; }
+  @media (max-width:600px) { .show-card { grid-template-columns:50px 1fr; } }
+
+  .cal-month-label { font-size:19px; }
+  .cal-nav-btn { width:40px; height:40px; font-size:22px; }
+  .cal-dow { font-size:10px; }
+  .cal-cell { min-height:82px; }
+  .cal-day-num { width:24px; height:24px; font-size:12px; }
+
+  .edit-bar { font-size:12px; padding:10px 12px; }
+  .edit-row { border-radius:16px; padding:11px 12px 11px 15px; margin-bottom:8px; }
+  .edit-input, .edit-field select { min-height:40px; }
+  .modal-title { font-size:16px; }
+  .day-item { padding:11px 12px 11px 15px; }
+  .crew-panel-header { padding:11px 14px; font-size:14px; }
+  .crew-day { padding:6px 14px; font-size:12px; }
+  .crew-day-pill { font-size:10px; }
+  .crew-day-detail { font-size:11px; }
 </style>
 
 <!-- Password gate -->
@@ -895,6 +951,30 @@ try { OVR = JSON.parse(localStorage.getItem('acoustik-crew-overrides-v1')||'{}')
 function saveOVR() { try { localStorage.setItem('acoustik-crew-overrides-v1', JSON.stringify(OVR)); } catch(e) {} }
 
 // Shared store: every viewer's edits are saved to the artifact database and appear live for everyone
+// ── Shared storage when hosted outside Claude (e.g. GitHub Pages) ──
+// Paste your Firebase web-app config here (see setup steps). Leave as null inside Claude, which has its own shared storage.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAfaPAZiQx3e8gbar76qAtw2RDHbo9udKc",
+  authDomain: "acoustikcrew-efcb4.firebaseapp.com",
+  databaseURL: "https://acoustikcrew-efcb4-default-rtdb.firebaseio.com",
+  projectId: "acoustikcrew-efcb4",
+  storageBucket: "acoustikcrew-efcb4.firebasestorage.app",
+  messagingSenderId: "137492313813",
+  appId: "1:137492313813:web:e755b7b82739100ad4145c"
+};
+/* Example:
+const FIREBASE_CONFIG = { apiKey:"...", authDomain:"...", projectId:"...", storageBucket:"...", messagingSenderId:"...", appId:"..." };
+*/
+function loadScript(src) { return new Promise((res, rej) => { const t = document.createElement('script'); t.src = src; t.onload = res; t.onerror = () => rej(new Error('load '+src)); document.head.appendChild(t); }); }
+async function initFirebase() {
+  if (!window.firebase) {
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');
+  }
+  if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  return firebase.firestore();
+}
+let syncOn = false;
 let DB = null, canWrite = true, pendingRender = false;
 function encK(k) { return encodeURIComponent(k).replace(/'/g,'%27'); }
 // ── Warehouse day edits (shared with everyone): date -> {crew:[names]} replaces the automatic warehouse crew ──
@@ -927,11 +1007,14 @@ function pushOvr(key) {
 }
 (async () => {
   try {
-    if (!window.claude || !window.claude.use) return;
-    const u = await window.claude.use('user');
-    if (u && u.can && u.can('data.write') === false) canWrite = false;
-    DB = await window.claude.use('db');
+    if (window.claude && window.claude.use) {
+      const u = await window.claude.use('user');
+      if (u && u.can && u.can('data.write') === false) canWrite = false;
+      DB = await window.claude.use('db');
+    }
+    if (!DB && FIREBASE_CONFIG) DB = await initFirebase();
     if (!DB) return;
+    syncOn = true; try { if (viewMode==='edit') render(); } catch(e) {}
     DB.collection('crewEdits').onSnapshot(snap => {
       const o = {};
       snap.docs.forEach(d => { const v = d.data(); if (v && v.key && v.ov) o[v.key] = v.ov; });
@@ -1151,7 +1234,13 @@ async function exportRentman() {
   }
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   try {
-    const downloads = await window.claude.use('downloads');
+    const downloads = (window.claude && window.claude.use) ? await window.claude.use('downloads') : null;
+    if (!downloads) {
+      const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'acoustik_rentman_export.csv';
+      document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      return;
+    }
     if (downloads) {
       await downloads.save({
         filename: 'acoustik_rentman_export.csv',
@@ -1468,7 +1557,7 @@ function renderCrew() {
   for (const w of whEntries) whByDate[w.dateStr] = w.crew;
 
   const MEMBERS = [
-    {key:'rafa',  label:'Rafa Ruiz',      hdrCls:'rafa-hdr',  role:'GSH Lead',
+    {key:'rafa',  label:'Rafa Ruis',      hdrCls:'rafa-hdr',  role:'GSH Lead',
       hasDay: s => s.hasRafa,  warehouseEligible: true},
     {key:'becky', label:'Becky Corrigan',  hdrCls:'becky-hdr', role:'KD Primary / GSH #1',
       hasDay: s => s.hasBecky, warehouseEligible: true},
@@ -1623,7 +1712,7 @@ function addEditSlot(btn) {
   if (n>=5) return;
   slotMin[decodeURIComponent(row.dataset.key)] = n+1;
   const cell = btn.closest('.slot-plus');
-  cell.insertAdjacentHTML('beforebegin', mkIn('', 'gsh','slot'+n,row.dataset.key,'Pick or type','Crew '+(n+1),'dl-crew3'));
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'gsh','slot'+n,row.dataset.key,'Name','Crew '+(n+1),'dl-crew3'));
   const inp = row.querySelector('input[data-field="slot'+n+'"]');
   if (n+1>=5) cell.remove();
   if (inp) inp.focus();
@@ -1633,7 +1722,7 @@ function whEditRow(ds, crew) {
   const dt = d(ds);
   const n = Math.min(5, Math.max(3, crew.length, slotMin[key]||0));
   let fields = '';
-  for (let i=0;i<n;i++) fields += mkIn(crew[i]||'', 'wh','slot'+i,enc,'Pick or type','Person '+(i+1),'dl-crew3');
+  for (let i=0;i<n;i++) fields += mkIn(crew[i]||'', 'wh','slot'+i,enc,'Name','Person '+(i+1),'dl-crew3');
   if (n<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addWhSlot(this)" title="Add another person (up to 5)">+</button></div>`;
   const reset = WHOVR[ds] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetWh('${ds}')">↺ Reset</button>` : '';
   return `<div class="edit-row wh-row${WHOVR[ds]?' edited':''}" data-key="${enc}">
@@ -1647,7 +1736,7 @@ function addWhSlot(btn) {
   if (n>=5) return;
   slotMin[decodeURIComponent(row.dataset.key)] = n+1;
   const cell = btn.closest('.slot-plus');
-  cell.insertAdjacentHTML('beforebegin', mkIn('', 'wh','slot'+n,row.dataset.key,'Pick or type','Person '+(n+1),'dl-crew3'));
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'wh','slot'+n,row.dataset.key,'Name','Person '+(n+1),'dl-crew3'));
   const inp = row.querySelector('input[data-field="slot'+n+'"]');
   if (n+1>=5) cell.remove();
   if (inp) inp.focus();
@@ -1674,7 +1763,7 @@ function addKdSlot(btn) {
   if (n>=2) return;
   slotMin[decodeURIComponent(row.dataset.key)] = n+1;
   const cell = btn.closest('.slot-plus');
-  cell.insertAdjacentHTML('beforebegin', mkIn('', 'kdx','extra'+n,row.dataset.key,'Pick or type','Crew '+(4+n),'dl-names'));
+  cell.insertAdjacentHTML('beforebegin', mkIn('', 'kdx','extra'+n,row.dataset.key,'Name','Crew '+(4+n),'dl-names'));
   const inp = row.querySelector('input[data-field="extra'+n+'"]');
   if (n+1>=2) cell.remove();
   if (inp) inp.focus();
@@ -1865,7 +1954,7 @@ function renderEdit() {
     }
     for (const g of Object.values(groups)) g.rows.sort((a,b)=>(a.dt-b.dt)||(a.o-b.o));
   }
-  let html = `<div class="edit-bar"><span>${canWrite ? 'Edit the date, title, location or crew, and who is in the warehouse each day. Changes save automatically and update live for everyone using this planner.' : 'View only — you need Contributor access to make changes.'}</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip${showPast?' on':''}" style="${showPast?'border-color:var(--accent);color:var(--accent);background:var(--accent-bg)':''}" onclick="toggleEditPast()" ${scopeMode==='all'?'disabled title="Already showing all dates (All 2026–27)"':''}>🕘 Past dates</button>${canWrite?`<button class="nav-btn btn-primary" onclick="openAdd()">+ Add</button>`:''}${nOvr?`<button class="nav-btn" onclick="resetAll()">Reset all edits (${nOvr})</button>`:''}</span></div>`;
+  let html = (!syncOn ? `<div class="edit-bar" style="color:var(--warn);background:var(--warn-bg)"><span>⚠ Not connected to shared storage — changes only save on this device.</span></div>` : '') + `<div class="edit-bar"><span>${canWrite ? 'Edit the date, title, location or crew, and who is in the warehouse each day. Changes save automatically and update live for everyone using this planner.' : 'View only — you need Contributor access to make changes.'}</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip${showPast?' on':''}" style="${showPast?'border-color:var(--accent);color:var(--accent);background:var(--accent-bg)':''}" onclick="toggleEditPast()" ${scopeMode==='all'?'disabled title="Already showing all dates (All 2026–27)"':''}>🕘 Past dates</button>${canWrite?`<button class="nav-btn btn-primary" onclick="openAdd()">+ Add</button>`:''}${nOvr?`<button class="nav-btn" onclick="resetAll()">Reset all edits (${nOvr})</button>`:''}</span></div>`;
   for (const [gk, g] of Object.entries(groups).sort((x,y)=>x[0]<y[0]?-1:1)) {
     html += `<div class="month-group"><div class="month-header">${g.label}</div>`;
     for (const it of g.rows) {
@@ -1879,13 +1968,13 @@ function renderEdit() {
         fields = mkIn(s.c.foh, 'kd','foh',enc,'TBC','FOH','dl-names') + mkIn(s.c.mons, 'kd','mons',enc,'TBC','Mons','dl-names') + mkIn(s.c.patch, 'kd','patch',enc,'TBC','Patch','dl-names');
         const ex = s.extras||[];
         const nEx = Math.min(2, Math.max(ex.length, slotMin[s.key]||0));
-        for (let i=0;i<nEx;i++) fields += mkIn(ex[i]||'', 'kdx','extra'+i,enc,'Pick or type','Crew '+(4+i),'dl-names');
+        for (let i=0;i<nEx;i++) fields += mkIn(ex[i]||'', 'kdx','extra'+i,enc,'Name','Crew '+(4+i),'dl-names');
         if (nEx<2 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addKdSlot(this)" title="Add another person (up to 5)">+</button></div>`;
         const loc = (s.c.local ? (Array.isArray(s.c.local)?s.c.local:[s.c.local]) : []);
       } else {
         const cur = crew3.filter(n => s.c[n.toLowerCase()]).concat(s.typed||[]).slice(0,5);
         const nSlots = Math.min(5, Math.max(3, cur.length, slotMin[s.key]||0));
-        for (let i=0;i<nSlots;i++) fields += mkIn(cur[i]||'', 'gsh','slot'+i,enc,'Pick or type','Crew '+(i+1),'dl-crew3');
+        for (let i=0;i<nSlots;i++) fields += mkIn(cur[i]||'', 'gsh','slot'+i,enc,'Name','Crew '+(i+1),'dl-crew3');
         if (nSlots<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addEditSlot(this)" title="Add another person (up to 5)">+</button></div>`;
       }
       const legacyTmp = (OVR[s.key] && OVR[s.key].temp) ? `<div class="edit-extra">Temp: ${OVR[s.key].temp} <button class="nav-btn" style="padding:1px 8px;font-size:10px" onclick="onTempClear('${enc}')"${canWrite?'':' disabled'}>clear</button></div>` : '';
