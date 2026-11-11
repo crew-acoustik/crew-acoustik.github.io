@@ -123,6 +123,8 @@
   .chip.on { border-color:currentColor; }
   .chip.gsh.on  { background:var(--gsh-bg); color:var(--gsh); }
   .chip.kd.on   { background:var(--kd-bg);  color:var(--kd); }
+  .chip.wh.on { background:#e3f1f5; color:#2f7a8f; }
+  .chip.oth.on { background:var(--accent-bg); color:var(--accent); }
   .chip.gaps.on { background:var(--gap-bg); color:var(--gap); }
   .chip.crew-rafa.on  { background:#e6f4ec; color:var(--rafa); }
   .chip.crew-becky.on { background:#f3eaf9; color:var(--becky); }
@@ -520,6 +522,23 @@
   .modal-grid .full { grid-column:1/-1; }
   .modal-actions { position:sticky; bottom:calc(-20px - env(safe-area-inset-bottom,0px)); background:var(--bg2); padding:12px 0 calc(8px + env(safe-area-inset-bottom,0px)); margin-top:12px; border-top:1px solid var(--border); }
 
+  /* client colour stripes: Guinness green, Candlelight blue (always, even with gaps/conflicts) */
+  :root { --gsh-stripe:#1f9d57; --kd-stripe:#2f6fe0; }
+  .show-card.client-gsh, .show-card.client-gsh.has-gap, .show-card.client-gsh.has-conflict { --stripe:var(--gsh-stripe); border-left-color:var(--gsh-stripe); }
+  .show-card.client-kd, .show-card.client-kd.has-gap, .show-card.client-kd.has-conflict { --stripe:var(--kd-stripe); border-left-color:var(--kd-stripe); }
+  .edit-row.c-gsh, .edit-row.c-gsh.has-gap, .edit-row.c-gsh.has-conflict { --stripe-e:var(--gsh-stripe); }
+  .edit-row.c-kd, .edit-row.c-kd.has-gap, .edit-row.c-kd.has-conflict { --stripe-e:var(--kd-stripe); }
+  /* delete-event x */
+  .edit-row { position:relative; }
+  .row-x { position:absolute; top:4px; right:6px; width:20px; height:20px; padding:0; border:none; background:transparent; color:var(--fg3,#9a9a9a); opacity:.65;
+    font-size:17px; line-height:20px; text-align:center; cursor:pointer; border-radius:50%; }
+  .row-x:hover { opacity:1; background:rgba(128,128,128,.18); }
+  .edit-row:has(.row-x) > .edit-head { padding-right:22px; }
+  /* crew-needed pin */
+  .need-pin { grid-column:1/-1; display:flex; align-items:center; gap:6px; margin-top:6px; padding:7px 11px; border-radius:10px;
+    background:var(--warn-bg); color:var(--warn); border:1px solid color-mix(in srgb,var(--warn) 32%,transparent); font-size:12px; font-weight:700; cursor:default; }
+  .edit-row > .need-pin, .day-item > .need-pin { margin-top:8px; }
+
   /* password gate */
   #lock { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:24px;
     background:radial-gradient(120% 80% at 50% 0%, var(--accent-bg), var(--bg) 60%); }
@@ -638,8 +657,9 @@
 
 <div class="filters">
   <span class="filter-label">Show:</span>
-  <button class="chip gsh on" id="f-gsh"   onclick="toggleFilter('gsh')">Guinness</button>
-  <button class="chip kd on"  id="f-kd"    onclick="toggleFilter('kd')">Candlelight</button>
+  <select class="edit-input" id="type-sel" onchange="setTypeFilter(this.value)" style="font-size:13px;padding:5px 10px;border-radius:999px;width:auto">
+    <option value="all">All</option><option value="gsh">Guinness</option><option value="kd">Candlelight</option><option value="wh">🏭 Warehouse</option><option value="other">Other</option>
+  </select>
   <button class="chip gaps"   id="f-gaps"  onclick="toggleFilter('gaps')">⚠ Gaps only</button>
   <span class="filter-label" style="margin-left:6px">Crew:</span>
   <button class="chip crew-rafa on"  id="f-rafa"  onclick="toggleCrewFilter('rafa')">Rafa</button>
@@ -770,16 +790,16 @@ const gshRaw = [
   {date:'2026-11-05',event:'Roving FARO (Christmas Activation)',status:'Booked',crew:{rafa:true,donal:true}},
   {date:'2026-11-10',event:'Xmas Activation (FARO) + Staff Party',status:'Booked',crew:{rafa:true,donal:true}},
   {date:'2026-11-11',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{becky:true}},
-  {date:'2026-11-13',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true},note:'Becky & Donal on KD (Elvis)'},
+  {date:'2026-11-13',event:'Xmas Activation (FARO)',status:'Booked',crew:{rafa:true}},
   {date:'2026-11-14',event:'Arrol Always On',status:'Booked',crew:{rafa:true,other:'Keelan'},note:'Becky on KD (ABBA)'},
   {date:'2026-11-16',event:'Xmas Activation (FARO)',status:'Booked',crew:{becky:true}},
   {date:'2026-11-18',event:'Sunbeam',client:'other',venue:'TBC',status:'Booked',crew:{becky:true,donal:true}},
-  {date:'2026-11-18',event:'Xmas Activation (Barbershop Quartet) + Gravity 2 / Full Building',status:'Booked',crew:{rafa:true},need:2,note:'2nd crew needed — Becky & Donal on Sunbeam'},
+  {date:'2026-11-18',event:'Xmas Activation (Barbershop Quartet) + Gravity 2 / Full Building',status:'Booked',crew:{rafa:true}},
   {date:'2026-11-19',event:'Xmas Activation (FARO)',status:'Booked',crew:{donal:true}},
   {date:'2026-11-21',event:'Arrol Always On',status:'Booked',crew:{rafa:true},note:'Becky on KD (Xmas Carols)'},
   {date:'2026-11-23',event:'Xmas Activation (FARO)',status:'Booked',crew:{becky:true}},
   {date:'2026-11-25',event:'St Patricks Cathedral',client:'other',venue:'St Patricks Cathedral',status:'Booked',crew:{becky:true,donal:true}},
-  {date:'2026-11-25',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{rafa:true},note:'Donal on St Patricks Cathedral'},
+  {date:'2026-11-25',event:'Xmas Activation (Barbershop Quartet)',status:'Booked',crew:{rafa:true}},
   {date:'2026-11-26',event:'Xmas Activation (FARO) + Arthurs',status:'Booked',crew:{rafa:true,donal:true}},
   {date:'2026-11-28',event:'Arrol Always On',status:'Booked',crew:{becky:true}},
   {date:'2026-11-29',event:'Arthurs',status:'Booked',crew:{becky:true}},
@@ -981,7 +1001,7 @@ function saveWh() { try { localStorage.setItem('acoustik-warehouse-v1', JSON.str
 function pushWh(ds) {
   if (!DB) return;
   const ref = DB.collection('warehouseEdits').doc(ds);
-  const p = WHOVR[ds] ? ref.set({date:ds, crew:WHOVR[ds].crew}) : ref.delete();
+  const p = WHOVR[ds] ? ref.set(WHOVR[ds].del ? {date:ds, crew:[], del:true} : {date:ds, crew:WHOVR[ds].crew}) : ref.delete();
   Promise.resolve(p).catch(()=>{});
 }
 // ── Added events (shared with everyone) ──
@@ -1019,7 +1039,7 @@ function pushOvr(key) {
     }, () => {});
     DB.collection('warehouseEdits').onSnapshot(snap => {
       const o = {};
-      snap.docs.forEach(x => { const v = x.data(); if (v && v.date && Array.isArray(v.crew)) o[v.date] = {crew:v.crew}; });
+      snap.docs.forEach(x => { const v = x.data(); if (v && v.date && Array.isArray(v.crew)) o[v.date] = v.del ? {crew:[], del:true} : {crew:v.crew}; });
       WHOVR = o; saveWh(); refreshShared();
     }, () => {});
     DB.collection('customEvents').onSnapshot(snap => {
@@ -1030,6 +1050,12 @@ function pushOvr(key) {
   } catch(e) {}
 })();
 
+// ── Crew needed per event (set in the Edit tab); a pin shows when fewer people are assigned ──
+function needOf(ov, base) {
+  const v = (ov && ov.need!=null && ov.need!=='') ? +ov.need : (base!=null ? +base : 0);
+  return isFinite(v) && v>0 ? Math.min(20, Math.floor(v)) : 0;
+}
+function needMsg(n) { return n===1 ? '1 more crew member needed' : n+' more crew needed'; }
 function tempNames(ov) {
   return String((ov && ov.temp) || '').split(',').map(x=>cleanTxt(x)).filter(Boolean).slice(0,6);
 }
@@ -1038,11 +1064,11 @@ function buildShows() {
   const customRows = CUSTOM.filter(x => x && x.id && /^\d{4}-\d{2}-\d{2}$/.test(x.date||'') && x.title);
   const gshAll = gshRaw.concat(customRows.filter(x=>x.client!=='kd').map(x=>({
     date:x.date, event:cleanTxt(x.title), venue:cleanTxt(x.venue)||(x.client==='gsh'?'Guinness Storehouse':'TBC'),
-    client:x.client==='other'?'other':'gsh', status:x.status||'Booked', crew:{...(x.crew||{})}, customId:x.id
+    client:x.client==='other'?'other':'gsh', status:x.status||'Booked', crew:{...(x.crew||{})}, need:x.need, customId:x.id
   })));
   const kdAll = kdRaw.concat(customRows.filter(x=>x.client==='kd').map(x=>({
     date:x.date, show:cleanTxt(x.title), venue:cleanTxt(x.venue)||'TBC',
-    status:x.status||'Booked', crew:{...(x.crew||{})}, customId:x.id
+    status:x.status||'Booked', crew:{...(x.crew||{})}, need:x.need, customId:x.id
   })));
   for (const s of gshAll) {
     const c = {...s.crew};
@@ -1059,6 +1085,7 @@ function buildShows() {
     }
     // Manual edit wins over automatic rules
     const ov = OVR[s.date+'|'+s.event];
+    if (ov && ov.del) continue;
     const eDate = (ov && ov.date) || s.date;
     const eTitle = (ov && ov.title) || s.event;
     let typed = [];
@@ -1084,14 +1111,16 @@ function buildShows() {
       dt:d(eDate), dateStr:eDate, client:s.client||'gsh',
       title:eTitle, venue:(ov && ov.venue) || s.venue || 'Guinness Storehouse', status:s.status,
       key:s.date+'|'+s.event, custom:s.customId||null, typed, c,
+      need:needOf(ov,s.need), short:Math.max(0, needOf(ov,s.need)-crew.length),
       crew, note:[s.note,whNote].filter(Boolean).join(' · '),
-      hasGap: crew.length===0 || (s.need && crew.length<s.need),
+      hasGap: crew.length===0 || (needOf(ov,s.need) && crew.length<needOf(ov,s.need)),
       hasBecky:!!c.becky, hasRafa:!!c.rafa, hasDonal:!!c.donal,
       hasConflict:false
     });
   }
   for (const s of kdAll) {
     const kov = OVR[s.date+'|'+s.show] || {};
+    if (kov.del) continue;
     const c = {...s.crew, ...kov};
     const crew = [];
     if (c.foh && c.foh!=='TBC') crew.push({name:c.foh, role:'FOH', type:isRafa(c.foh)?'rafa':isBecky(c.foh)?'becky':isDonal(c.foh)?'donal':'other'});
@@ -1110,8 +1139,9 @@ function buildShows() {
       dt:d(kov.date||s.date), dateStr:kov.date||s.date, client:'kd',
       title:kov.title||s.show, venue:kov.venue||s.venue, status:s.status,
       key:s.date+'|'+s.show, custom:s.customId||null, extras, c,
+      need:needOf(kov,s.need), short:Math.max(0, needOf(kov,s.need)-crew.length),
       crew, note:s.note||'',
-      hasGap: missPatch||missMons,
+      hasGap: missPatch||missMons||(needOf(kov,s.need)>crew.length),
       hasBecky: beckyR, hasRafa:isRafa(c.foh)||isRafa(c.mons)||isRafa(c.patch)||extras.some(isRafa),
       hasDonal:!!c.donal||isDonal(c.foh)||isDonal(c.mons)||isDonal(c.patch)||locals.some(isDonal)||extras.some(isDonal),
       hasConflict:false
@@ -1206,7 +1236,7 @@ function buildWarehouseEntries(shows) {
     .sort((a,b)=>a.dt-b.dt);
 }
 
-let activeFilters = {gsh:true,kd:true,gaps:false,rafa:true,becky:true,donal:true};
+let activeFilters = {gsh:true,kd:true,wh:true,other:true,gaps:false,rafa:true,becky:true,donal:true};
 let scopeMode = 'upcoming';
 let viewMode  = 'list';
 let calYear = TODAY.getFullYear(), calMonth = TODAY.getMonth();
@@ -1264,10 +1294,14 @@ function switchView(v) {
   document.getElementById('edit-view').style.display  = v==='edit' ?'block':'none';
   render();
 }
+const TYPE_KEYS = ['gsh','kd','wh','other'];
+function setTypeFilter(v) {
+  TYPE_KEYS.forEach(k => activeFilters[k] = (v==='all' || k===v));
+  render();
+}
 function toggleFilter(f) {
-  if (f==='gaps') activeFilters.gaps=!activeFilters.gaps;
-  else activeFilters[f]=!activeFilters[f];
-  document.getElementById('f-'+f).classList.toggle('on',activeFilters[f]);
+  activeFilters.gaps = !activeFilters.gaps;
+  document.getElementById('f-gaps').classList.toggle('on',activeFilters.gaps);
   render();
 }
 const CREW_KEYS = ['rafa','becky','donal'];
@@ -1288,6 +1322,7 @@ function filteredShows(ignoreScope) {
   return shows.filter(s=>{
     if (s.client==='gsh'&&!activeFilters.gsh) return false;
     if (s.client==='kd' &&!activeFilters.kd)  return false;
+    if (s.client==='other'&&!activeFilters.other) return false;
     if (activeFilters.gaps&&!s.hasGap&&!s.hasConflict) return false;
     const crewMatch=(activeFilters.rafa&&s.hasRafa)||(activeFilters.becky&&s.hasBecky)||(activeFilters.donal&&s.hasDonal)||(!personMode()&&!s.hasRafa&&!s.hasBecky&&!s.hasDonal);
     return crewMatch;
@@ -1320,7 +1355,8 @@ function crewTag(c) {
 }
 function renderList(shows, range) {
   const emptyMsg = `<div class="empty"><div class="icon">📋</div><p>${range ? 'No shows or warehouse days in this period.' : 'No shows match your filters.'}</p></div>`;
-  if (!shows.length && !range) return emptyMsg;
+  if (!shows.length && !range && !activeFilters.wh) return emptyMsg;
+  const whOnly = activeFilters.wh && !activeFilters.gsh && !activeFilters.kd && !activeFilters.other;
 
   // Build warehouse entries for the same date range as shows
   const whEntries = buildWarehouseEntries(allShows);
@@ -1335,7 +1371,9 @@ function renderList(shows, range) {
     groups[k].shows.push(s);
   }
   // Every weekday with no event at all (Guinness, Candlelight or Other) is listed with who is in the warehouse.
-  if (personMode() && !activeFilters.gaps) {
+  if (!activeFilters.wh) {
+    // warehouse days hidden by the type filter
+  } else if (personMode() && !activeFilters.gaps) {
     // Selected person(s): also list the weekdays they are in the warehouse (their other working days)
     const WH_START = new Date(2026, 10, 1), WH_END = new Date(2026, 11, 24);
     const mine = selectedPeople().map(k=>k[0].toUpperCase()+k.slice(1));
@@ -1366,7 +1404,7 @@ function renderList(shows, range) {
       const dow = dt.getDay();
       if (dow===0 || dow===6) continue;
       const ds = isoStr(dt);
-      if (evDates.has(ds)) continue; // days with events already show their warehouse crew in the event card
+      if (evDates.has(ds) && !(whOnly && (whByDate[ds]||{crew:[]}).crew.length)) continue; // event days show warehouse crew in the card (unless only Warehouse is selected)
       const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
       if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), shows:[]};
       const w = whByDate[ds];
@@ -1416,6 +1454,7 @@ function renderList(shows, range) {
           ${confNote?`<div class="note-line" style="color:var(--warn)">⚠ ${confNote}</div>`:''}
         </div>
         <div class="flags">${statusPill(s)}<span class="chev">▾</span></div>
+        ${s.short>0?`<div class="need-pin">📌 ${needMsg(s.short)}</div>`:''}
         ${showDetail(s, wh ? wh.crew : [])}
       </div>`;
     }).join('');
@@ -1452,7 +1491,7 @@ function renderCal() {
     const other = dt.getMonth()!==calMonth;
     const dayShows = byDate[ds]||[];
     const whDay = whAll.find(w=>w.dateStr===ds);
-    const whChip = whDay ? `<div class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${whDay.crew.join(' · ')}</div>` : '';
+    const whChip = (whDay && activeFilters.wh) ? `<div class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${whDay.crew.join(' · ')}</div>` : '';
     const MAXEV = 3;
     const evHtml = dayShows.slice(0,MAXEV).map(s=>{
       let cls='ev-gsh';
@@ -1460,10 +1499,10 @@ function renderCal() {
       else if (s.hasGap) cls='ev-gap';
       else if (s.client==='kd') cls='ev-kd';
       else if (s.status==='Done') cls='ev-done';
-      return `<span class="cal-event ${cls}" title="${s.title}">${s.title}</span>`;
+      return `<span class="cal-event ${cls}" title="${s.title}${s.short>0?' — '+needMsg(s.short):''}">${s.short>0?'📌 ':''}${s.title}</span>`;
     }).join('') + (dayShows.length>MAXEV ? `<span class="cal-more">+${dayShows.length-MAXEV} more</span>` : '');
-    const ini = whDay ? whDay.crew.map(n=>String(n).trim()[0].toUpperCase()).join('') : '';
-    const whDot = whDay ? `<span class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${ini}</span>` : '';
+    const ini = (whDay && activeFilters.wh) ? whDay.crew.map(n=>String(n).trim()[0].toUpperCase()).join('') : '';
+    const whDot = (whDay && activeFilters.wh) ? `<span class="cal-event ev-warehouse" title="Warehouse: ${whDay.crew.join(', ')}">🏭 ${ini}</span>` : '';
     const wknd = (dt.getDay()===0||dt.getDay()===5||dt.getDay()===6)?' weekend':'';
     html += `<div class="cal-cell${ds===todayStr?' today':''}${wknd}${other?' other-month':''}" onclick="openDay('${ds}')"><div class="cal-day-num">${dt.getDate()}</div><div class="cal-dots">${evHtml}${whDot}</div></div>`;
   }
@@ -1479,13 +1518,14 @@ function openDay(ds) {
   closeDay();
   const dt = d(ds);
   const shows = filteredShows(true).filter(x=>x.dateStr===ds);
-  const wh = buildWarehouseEntries(allShows).find(w=>w.dateStr===ds);
-  const stripe = x => x.hasConflict?'var(--warn)':x.hasGap?'var(--gap)':x.client==='kd'?'var(--kd-mid)':x.client==='other'?'var(--accent)':'var(--gsh-mid)';
+  const wh = activeFilters.wh ? buildWarehouseEntries(allShows).find(w=>w.dateStr===ds) : null;
+  const stripe = x => x.client==='kd'?'var(--kd-stripe)':x.client==='other'?'var(--accent)':'var(--gsh-stripe)';
   const items = shows.map(x=>`<div class="day-item" style="--stripe:${stripe(x)}">
       <div class="day-item-top"><div class="show-name">${x.title}</div>${statusPill(x)}</div>
       <div class="show-venue">${x.venue||''}</div>
       <div class="crew-row">${x.crew.length ? x.crew.map(crewTag).join('') : '<span class="crew-tag tag-gap">No crew assigned</span>'}</div>
       ${x.note?`<div class="note-line">${x.note}</div>`:''}
+      ${x.short>0?`<div class="need-pin">📌 ${needMsg(x.short)}</div>`:''}
       ${x.conflictInfo?`<div class="note-line" style="color:var(--warn)">⚠ ${x.conflictInfo.map(c=>c.who.join('+')+' also on '+c.show).join('; ')}</div>`:''}
       ${canWrite?`<button class="nav-btn" style="margin-top:10px" onclick="closeDay();goEdit('${encK(x.key)}')">✎ Edit</button>`:''}
     </div>`).join('');
@@ -1722,7 +1762,8 @@ function whEditRow(ds, crew) {
   for (let i=0;i<n;i++) fields += mkIn(crew[i]||'', 'wh','slot'+i,enc,'Name','Person '+(i+1),'dl-crew3');
   if (n<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addWhSlot(this)" title="Add another person (up to 5)">+</button></div>`;
   const reset = WHOVR[ds] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetWh('${ds}')">↺ Reset</button>` : '';
-  return `<div class="edit-row wh-row${WHOVR[ds]?' edited':''}" data-key="${enc}">
+  const xbtn = canWrite ? `<button class="row-x" title="Delete this warehouse day" aria-label="Delete this warehouse day" onclick="delWh('${ds}')">×</button>` : '';
+  return `<div class="edit-row wh-row${WHOVR[ds]?' edited':''}" data-key="${enc}">${xbtn}
     <div class="edit-head"><span class="edit-date" style="min-width:90px;font-weight:600">${DAYS[dt.getDay()]} ${dt.getDate()} ${MSHORT[dt.getMonth()]}</span><span class="tag-warehouse" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px">🏭 Warehouse</span>${reset}</div>
     <div class="edit-fields">${fields}</div>
   </div>`;
@@ -1753,6 +1794,11 @@ function onWhChange(el, removing) {
   WHOVR[ds] = {crew:names};
   saveWh(); pushWh(ds); rerenderKeepFocus();
 }
+function delWh(ds) {
+  if (!canWrite) return;
+  if (!confirm('Delete the warehouse day on '+ds.split('-').reverse().join('/')+'?\n\nThis removes it for everyone using the planner.')) return;
+  WHOVR[ds] = {crew:[], del:true}; delete slotMin['WH|'+ds]; saveWh(); pushWh(ds); render();
+}
 function resetWh(ds) { delete WHOVR[ds]; delete slotMin['WH|'+ds]; saveWh(); pushWh(ds); render(); }
 function addKdSlot(btn) {
   const row = btn.closest('.edit-row');
@@ -1782,6 +1828,19 @@ function addModalSlot(btn) {
   cell.insertAdjacentHTML('beforebegin', addIn('add-c'+(n+1),'Crew '+(n+1),'add-names','Name'));
   if (n+1>=5) cell.remove();
   const inp = document.getElementById('add-c'+(n+1)); if (inp) inp.focus();
+}
+function needField(s, enc) {
+  return `<label class="edit-field"><span>Crew needed</span><input class="edit-input" type="number" inputmode="numeric" min="0" max="20" placeholder="—" value="${s.need||''}" data-key="${enc}" data-kind="need" data-field="need" onchange="onNeedChange(this)"${canWrite?'':' disabled'}></label>`;
+}
+function onNeedChange(el) {
+  const key = decodeURIComponent(el.dataset.key);
+  let n = parseInt(el.value, 10); if (!(n>0)) n = 0; if (n>20) n = 20;
+  const sh = allShows.find(x => x.key===key);
+  const baseNeed = sh && sh.custom ? ((CUSTOM.find(x=>x.id===sh.custom)||{}).need||0) : 0;
+  const cur = {...(OVR[key]||{})};
+  if (n) cur.need = n; else if (baseNeed) cur.need = 0; else delete cur.need;
+  if (Object.keys(cur).length) OVR[key] = cur; else delete OVR[key];
+  saveOVR(); allShows = buildShows(); pushOvr(key); rerenderKeepFocus();
 }
 function onTempClear(enc) { const key = decodeURIComponent(enc); const cur = {...(OVR[key]||{})}; delete cur.temp; if (Object.keys(cur).length) OVR[key]=cur; else delete OVR[key]; saveOVR(); allShows = buildShows(); render(); pushOvr(key); }
 function onCrewChange(el, removing) {
@@ -1839,7 +1898,10 @@ function addCrewHtml(type) {
 }
 function onAddType() {
   const t = document.getElementById('add-type').value;
-  document.getElementById('add-crew').innerHTML = addCrewHtml(t);
+  document.getElementById('add-crew').innerHTML = addCrewHtml(t==='wh'?'gsh':t);
+  const modal = document.getElementById('add-modal');
+  modal.querySelectorAll('[data-ev-only]').forEach(x => x.style.display = t==='wh' ? 'none' : '');
+  const mt = modal.querySelector('.modal-title'); if (mt) mt.textContent = t==='wh' ? 'Add warehouse day' : 'Add event';
   const v = document.getElementById('add-venue');
   if (v && (!v.value || v.dataset.auto==='1')) { v.value = t==='gsh' ? 'Guinness Storehouse' : ''; v.dataset.auto='1'; }
 }
@@ -1857,10 +1919,11 @@ function openAdd() {
     <div class="modal-head"><div class="modal-title">Add event</div><button class="modal-x" onclick="closeAdd()" title="Close">×</button></div>
     <div class="modal-grid">
       <label class="edit-field"><span>Date</span><input class="edit-input" type="date" id="add-date" value="${todayISO()}"></label>
-      <label class="edit-field"><span>Type</span><select id="add-type" onchange="onAddType()"><option value="gsh">Guinness Storehouse</option><option value="kd">Candlelight</option><option value="other">Other event</option></select></label>
-      <label class="edit-field full"><span>Event name</span><input class="edit-input" type="text" id="add-title" placeholder="Event name" maxlength="120"></label>
-      <label class="edit-field full"><span>Venue</span><input class="edit-input" type="text" id="add-venue" list="add-venue-list" placeholder="Venue" maxlength="120" data-auto="1" value="Guinness Storehouse" oninput="this.dataset.auto='0'"></label>
-      <label class="edit-field"><span>Status</span><select id="add-status"><option>Booked</option><option>Planned</option><option>TBC</option></select></label>
+      <label class="edit-field"><span>Type</span><select id="add-type" onchange="onAddType()"><option value="gsh">Guinness Storehouse</option><option value="kd">Candlelight</option><option value="other">Other event</option><option value="wh">🏭 Warehouse day</option></select></label>
+      <label class="edit-field full" data-ev-only="1"><span>Event name</span><input class="edit-input" type="text" id="add-title" placeholder="Event name" maxlength="120"></label>
+      <label class="edit-field full" data-ev-only="1"><span>Venue</span><input class="edit-input" type="text" id="add-venue" list="add-venue-list" placeholder="Venue" maxlength="120" data-auto="1" value="Guinness Storehouse" oninput="this.dataset.auto='0'"></label>
+      <label class="edit-field" data-ev-only="1"><span>Crew needed</span><input class="edit-input" type="number" inputmode="numeric" min="0" max="20" id="add-need" placeholder="—"></label>
+      <label class="edit-field" data-ev-only="1"><span>Status</span><select id="add-status"><option>Booked</option><option>Planned</option><option>TBC</option></select></label>
     </div>
     <div class="modal-sub">Crew</div>
     <div id="add-crew">${addCrewHtml('gsh')}</div>
@@ -1877,6 +1940,19 @@ function saveAdd() {
   const err = document.getElementById('add-err');
   const type = g('add-type'), date = g('add-date'), title = cleanTxt(g('add-title')), venue = cleanTxt(g('add-venue'));
   if (!date) { err.textContent = 'Please choose a date.'; return; }
+  if (type==='wh') {
+    const names = [];
+    [1,2,3,4,5].map(i=>g('add-c'+i)).map(v=>cleanTxt(v).replace(/,/g,' ').trim()).filter(Boolean).forEach(n => {
+      const low = n.toLowerCase();
+      if (low==='rafa'||low==='becky'||low==='donal') n = low[0].toUpperCase()+low.slice(1);
+      if (!names.some(o=>o.toLowerCase()===n.toLowerCase()) && names.length<5) names.push(n);
+    });
+    if (!names.length) { err.textContent = 'Please add at least one person for the warehouse.'; return; }
+    const ex = (buildWarehouseEntries(allShows).find(w=>w.dateStr===date)||{}).crew || [];
+    const merged = [...ex]; names.forEach(n => { if (!merged.some(o=>o.toLowerCase()===n.toLowerCase()) && merged.length<5) merged.push(n); });
+    WHOVR[date] = {crew:merged}; saveWh(); pushWh(date);
+    closeAdd(); if (d(date) < TODAY) editPast = true; render(); return;
+  }
   if (!title) { err.textContent = 'Please enter an event name.'; return; }
   let crew = {};
   if (type==='kd') {
@@ -1894,12 +1970,25 @@ function saveAdd() {
     });
     if (others.length) crew.other = others.join(', ');
   }
-  const ev = { id:'ce-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), client:type, date, title, venue, status:g('add-status')||'Booked', crew };
+  const ev = { id:'ce-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), client:type, date, title, venue, status:g('add-status')||'Booked', crew, need:Math.max(0,Math.min(20,parseInt(g('add-need'),10)||0)) };
   CUSTOM = [...CUSTOM, ev]; saveCustom();
   if (DB) Promise.resolve(DB.collection('customEvents').doc(ev.id).set(ev)).catch(()=>{});
   closeAdd(); allShows = buildShows();
   if (d(date) < TODAY) editPast = true; // so a past event you just added is visible in the Edit tab
   render();
+}
+function delEvent(enc) {
+  if (!canWrite) return;
+  const key = decodeURIComponent(enc);
+  const sh = allShows.find(x => x.key===key); if (!sh) return;
+  if (!confirm('Delete "'+sh.title+'" on '+sh.dateStr.split('-').reverse().join('/')+'?\n\nThis removes it for everyone using the planner.')) return;
+  if (sh.custom) {
+    CUSTOM = CUSTOM.filter(x=>x.id!==sh.custom); saveCustom();
+    if (DB) Promise.resolve(DB.collection('customEvents').doc(sh.custom).delete()).catch(()=>{});
+  } else {
+    OVR[key] = {...(OVR[key]||{}), del:true}; saveOVR(); pushOvr(key);
+  }
+  allShows = buildShows(); render();
 }
 let delArm = null;
 function delCustom(btn, id) {
@@ -1927,7 +2016,7 @@ function renderEdit() {
   const names = crewNames();
   const crew3 = ['Rafa','Becky','Donal'];
   let shows = allShows.filter(s => showPast || (s.dt>=TODAY && s.status!=='Done'));
-  shows = shows.filter(s => s.client==='kd' ? activeFilters.kd : activeFilters.gsh);
+  shows = shows.filter(s => s.client==='kd' ? activeFilters.kd : s.client==='other' ? activeFilters.other : activeFilters.gsh);
   const nOvr = Object.keys(OVR).length;
   const groups = {};
   for (const s of shows) {
@@ -1936,7 +2025,7 @@ function renderEdit() {
     groups[k].rows.push({s, dt:s.dt, o:0});
   }
   // Warehouse days (weekdays 1 Nov – 23 Dec): editable crew for each day
-  {
+  if (activeFilters.wh) {
     const WH_A = new Date(2026, 10, 1), WH_B = new Date(2026, 11, 24);
     let from = showPast ? WH_A : TODAY; if (from < WH_A) from = WH_A;
     const whMap = {}; buildWarehouseEntries(allShows).forEach(w => whMap[w.dateStr] = w.crew);
@@ -1944,7 +2033,16 @@ function renderEdit() {
     for (let dt = new Date(from); dt < WH_B; dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1)) {
       if (dt.getDay()===0 || dt.getDay()===6) continue;
       const ds = isoStr(dt);
+      if (WHOVR[ds] && WHOVR[ds].del) continue;
       if (evDates.has(ds) && !(whMap[ds]||[]).length && !WHOVR[ds]) continue; // event day, nobody in warehouse: no row
+      const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), rows:[]};
+      groups[k].rows.push({wh:ds, dt:new Date(dt), o:1, crew:whMap[ds]||[]});
+    }
+    for (const ds of Object.keys(WHOVR)) {
+      const dt = d(ds);
+      const inStd = dt>=WH_A && dt<WH_B && dt.getDay()!==0 && dt.getDay()!==6;
+      if (inStd || (WHOVR[ds] && WHOVR[ds].del) || (!showPast && dt<TODAY)) continue;
       const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
       if (!groups[k]) groups[k] = {label:MONTHS[dt.getMonth()]+' '+dt.getFullYear(), rows:[]};
       groups[k].rows.push({wh:ds, dt:new Date(dt), o:1, crew:whMap[ds]||[]});
@@ -1966,22 +2064,24 @@ function renderEdit() {
         const ex = s.extras||[];
         const nEx = Math.min(2, Math.max(ex.length, slotMin[s.key]||0));
         for (let i=0;i<nEx;i++) fields += mkIn(ex[i]||'', 'kdx','extra'+i,enc,'Name','Crew '+(4+i),'dl-names');
+        fields += needField(s, enc);
         if (nEx<2 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addKdSlot(this)" title="Add another person (up to 5)">+</button></div>`;
         const loc = (s.c.local ? (Array.isArray(s.c.local)?s.c.local:[s.c.local]) : []);
       } else {
         const cur = crew3.filter(n => s.c[n.toLowerCase()]).concat(s.typed||[]).slice(0,5);
         const nSlots = Math.min(5, Math.max(3, cur.length, slotMin[s.key]||0));
         for (let i=0;i<nSlots;i++) fields += mkIn(cur[i]||'', 'gsh','slot'+i,enc,'Name','Crew '+(i+1),'dl-crew3');
+        fields += needField(s, enc);
         if (nSlots<5 && canWrite) fields += `<div class="edit-field slot-plus"><span>&nbsp;</span><button class="nav-btn btn-primary" onclick="addEditSlot(this)" title="Add another person (up to 5)">+</button></div>`;
       }
       const legacyTmp = (OVR[s.key] && OVR[s.key].temp) ? `<div class="edit-extra">Temp: ${OVR[s.key].temp} <button class="nav-btn" style="padding:1px 8px;font-size:10px" onclick="onTempClear('${enc}')"${canWrite?'':' disabled'}>clear</button></div>` : '';
       const flag = s.hasConflict ? `<span class="status-pill pill-conflict">⚠ Conflict</span>` : s.hasGap ? `<span class="status-pill pill-gap">⚠ Gap</span>` : '';
       const conf = s.conflictInfo ? `<div class="edit-extra" style="color:var(--warn)">⚠ ${s.conflictInfo.map(c=>`${c.who.join('+')} also on ${c.client.toUpperCase()}: ${c.show}`).join(' · ')}</div>` : '';
-      const del = (s.custom && canWrite) ? `<button class="nav-btn btn-danger" onclick="delCustom(this,'${s.custom}')">🗑 Delete</button>` : '';
+      const del = canWrite ? `<button class="row-x" title="Delete this event" aria-label="Delete this event" onclick="delEvent('${enc}')">×</button>` : '';
       const reset = OVR[s.key] ? `<button class="nav-btn" style="margin-left:auto" onclick="resetOne('${enc}')">↺ Reset</button>` : '';
-      html += `<div class="edit-row${s.hasConflict?' has-conflict':s.hasGap?' has-gap':''}${OVR[s.key]?' edited':''}" data-key="${enc}">
-        <div class="edit-head"><input class="edit-input" type="date" value="${s.dateStr}" data-key="${enc}" data-field="date" onchange="onMetaChange(this)"${canWrite?'':' disabled'}><input class="edit-input edit-title-input" type="text" value="${s.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="title" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${badge}<input class="edit-input edit-venue-input" type="text" list="venue-list" placeholder="Location" value="${String(s.venue).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="venue" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${flag}${reset}${del}</div>
-        <div class="edit-fields">${fields}</div>${extra}${legacyTmp}${conf}
+      html += `<div class="edit-row c-${s.client}${s.hasConflict?' has-conflict':s.hasGap?' has-gap':''}${OVR[s.key]?' edited':''}" data-key="${enc}">
+        <div class="edit-head"><input class="edit-input" type="date" value="${s.dateStr}" data-key="${enc}" data-field="date" onchange="onMetaChange(this)"${canWrite?'':' disabled'}><input class="edit-input edit-title-input" type="text" value="${s.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="title" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${badge}<input class="edit-input edit-venue-input" type="text" list="venue-list" placeholder="Location" value="${String(s.venue).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-key="${enc}" data-field="venue" onchange="onMetaChange(this)"${canWrite?'':' disabled'}>${flag}${reset}</div>${del}
+        <div class="edit-fields">${fields}</div>${s.short>0?`<div class="need-pin">📌 ${needMsg(s.short)}</div>`:''}${extra}${legacyTmp}${conf}
       </div>`;
     }
     html += `</div>`;
